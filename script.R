@@ -44,7 +44,7 @@ access_secret <- 'eX78KEUNtaU6GZ0wFay5lafhbzeZhuLzHkq71RxKnt9xj'
 setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
 
 #function to pick random row in a dataframe
-pickRandomRows = function(df, numberOfRows = 10) {
+pickRandomRows = function(df, numberOfRows = 13) {
 df %>% dplyr::slice(sample(1:length(df[,1]), numberOfRows, replace=FALSE))
 }
 
@@ -60,6 +60,8 @@ library(sf)
 library(rgdal)
 shp <- readOGR(dsn=".", "latLongRadius")  #head
 p_area <- data.frame(st_as_sf(shp))
+
+#p_area %>% select(Party) %>% filter(Party=="Liberal Democrats")
 
 #unique party names
 unique_party <- as.character(unique(p_area$Party))
@@ -105,9 +107,7 @@ tweets_g <- searchTwitter(hashtags, n=1000, lang = "en",
                               )
                               if(length(tweets_g)!=0){
                                   tweets_g <- twListToDF(tweets_g)
-                                  tweets_g$longitude <- sub_p_area_$long
-                                  tweets_g$latitude <- sub_p_area_$lat
-                                  tweets_g <- data.frame(cbind(tweets_g, i, from=as.character(dates[1]), to=as.character(dates[2])), party_area=unique_party[i])
+                                  tweets_g <- data.frame(cbind(tweets_g, i, Long=sub_p_area_$long, lat=sub_p_area_$lat, from=as.character(dates[1]), to=as.character(dates[2])), party_area=unique_party[i])
                                   total_ <- total_ + nrow(tweets_g)
                                   
                                   flush.console()
@@ -133,6 +133,55 @@ write.table(all_Tweets,
 }
 
 
+
+
+
+tweets_g <- searchTwitter("radius2", n=5, lang = "en", 
+                          since='2020-01-13 00:00:00', until='2020-01-13 11:11:11', 
+                          geocode='53.474165,-2.35447,3.75mi')
+
+
+tweets_g <- searchTwitter("brexit", n=5, lang = "en", 
+                          since='2020-01-13 00:00:00', until='2020-01-13 11:24:11', 
+                          geocode='53.469,2.231,3.75mi')
+
+tweets_g <- searchTwitter("#downloadlatlongRadius2", n=5, lang = "en", 
+                                                  since='2020-01-13 00:00:00', until='2020-01-13 11:11:11', 
+                                                      geocode='53.474165,-2.35447,5mi')
+
+#home 53.451   -2.399
+tweets_g <- searchTwitter("#downloadlatlongRadius4", n=5, lang = "en", 
+                          since='2020-01-13 00:00:00', until='2020-01-13 12:29:00', 
+                          geocode='53.451,-2.399,25mi')
+#bdc
+tweets_g <- searchTwitter("#xperimenting", n=5, lang = "en", 
+                          since='2020-01-13 00:00:00', until='2020-01-13 12:29:11', 
+                          geocode='53.468,-2.238,25mi')
+
+#point_radius:
+# The point_radius: operator allows you to specify a circular geographic area and match Tweets 
+#containing Tweet-specific location data that fall within that area. To use, define a central lon-lat coordinate, 
+#and then set the radius (up to 25 miles). Any Tweet containing a geo Point that falls within this region will be matched. 
+#Addtionally, Tweets containing Twitter Places will match where the 'geo polygon defined for the Place' falls 
+#fully within the defined point-radius area. Places whose polygons fall outside the defined point-radius 
+#area to any extent will not match.
+
+
+tweets_g <- twListToDF(tweets_g)
+
+write.table(tweets_g, "someth.csv", sep=",")
+#xperimenting
+getwd()
+tweets_g <- twListToDF(tweets_g)
+tweets_g[[1]]
+write.table(all_Tweets, 
+            file=paste("C:/Users/monsu/Documents/GitHub/Sentiment-analysis/","download_", as.character(dates[1]), "_to_", as.character(dates[2]), "_", unique_party[i], ".csv", sep=""), 
+            sep=",", row.names = F)
+
+
+#)
+
+#xperimenting
 
 
 
