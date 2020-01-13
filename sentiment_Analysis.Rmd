@@ -1,5 +1,5 @@
 ---
-title: "Twitter-based analysis of political sentiments - A case of Brexit"
+title: "Twitter-based analysis of political sentiments - A case of 'Brexit'"
 
 author: |
   | `Authors:`
@@ -22,7 +22,7 @@ always_allow_html: yes
 #fig_caption: yes
 ##bibliography: references.bib
 
-abstract: The .
+abstract: The xxx
   
 vignette: >
   %\VignetteIndexEntry{Twitter-based analysis of political sentiments - A case of Brexit}
@@ -123,7 +123,9 @@ fig <- local({
 
 # Introduction
 
-Longitudinal 
+Twitter provides us with vast amounts of user-generated language data - a dream for anyone wanting to conduct textual analysis. More than that, tweets allow us to gain insights into the online public behaviour. As such, analysing Twitter has become a crucial source of information for brands and agencies.
+Several factors have given Twitter considerable advantages over other social media platforms for analysis. First, the limited character size of tweets provides us with a relatively homogeneous corpora. Second, the millions of tweets published everyday allows access to large data samples. Third, the tweets are publicly available and easily accessible as well as retrievable via APIs
+
 
 ```{r, echo=FALSE, include=FALSE}
 library(rtweet)
@@ -142,17 +144,175 @@ library(topicmodels)
 library(lubridate)
 ```
 
-#Experimental design
+# Research objectives
 
-#use the bing lexicon.
-```{r, echo=FALSE, include=FALSE}
+1. To analyse the political sentiments around `Brexit` before and after the 31st Jan. 2020 (`Brexit date`).
 
-```
+2. To examine whether the political sentiments bear any associations with political control (i.e. party) of the geographical regions (using the Dec. 2019 general election results).
 
+# Data download strategy
+
+The Twitter API is used to download tweets from different geographical areas across the UK. Figure `r fig$ref("figs1")`shows the data download strategy, which involves drawing sets of circles over areas that are now controlled by different political parties based on the last general elections (held on the 12th Dec. 2019). This enables us to download tweets that were tweeted in different areas across the country. Owing to the twitter download constraints, we randomly pick 12 circles from each political area each day and download all tweets that include the keywords `#Brexit` or `brexit`. The download covers from `Jan 1, 2020` to `Feb 29, 2020`. Table xx shows the total number tweets downloaded for each political area over the study period.   
 
 ```{r figs1, echo=FALSE, fig.cap=fig$cap("figs1", "Data Collection Design"), out.width = '60%', fig.align="center"} 
 knitr::include_graphics("dataextraction.png")
 ```
+
+```{r, echo=FALSE, include=FALSE}
+require(knitr)
+library(flextable)
+library(kableExtra)
+library(plyr) 
+library(textclean)
+```
+
+
+```{r, echo=FALSE, include=FALSE}
+col1 <- c("1", "2","3","4", "5")
+col2 <- c("xx","xx", "xx", "`xx`","`xx`")
+col3 <- c("xx", "xx", "xx", "xx","xx")
+col4 <- c("xx","xx", "xx", "xx","xx")
+tble <- data.frame(col1, col2, col3, col4)
+tble <- tble
+```
+
+```{r table1, results='asis', echo=FALSE, tidy.opts=list(width.cutoff=50)}
+knitr::kable(tble, caption = "Table 1. `Data manipulation` functions", col.names = c("SN","Function","Title","Description")) %>%
+  kable_styling(full_width = F) %>%
+  column_spec(1, bold = T, border_right = T) %>%
+  column_spec(2, width = "8em", background = "white") %>%
+  column_spec(3, width = "12em", background = "white") %>%
+  column_spec(4, width = "16em", background = "white")#%>%
+  #row_spec(3:5, bold = T, color = "white", background = "#D7261E")
+```
+
+# Data exploration
+
+```{r}
+#read-in data
+
+#append all downloaded data set
+polit_tweets_ <- read.csv(file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/downloads/download_2020-01-10_to_2020-01-11_Others.csv", sep=",", head=TRUE)
+filenames <- list.files(path = "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/downloads/", pattern = "*", full.names=TRUE)
+polit_tweets_ <- ldply(filenames, read.csv)
+head(polit_tweets_)
+
+#cleaning 1: remove 'https:/....'
+polit_tweets <- polit_tweets_ %>% 
+    mutate(day=as.Date(as.character(substr(created,1,10)), format = "%d")) %>%
+    mutate(text = gsub("http://*|https://*)", "", text))
+
+#convert to data.frame
+polit_tweets <- data.frame(polit_tweets)
+
+             
+#remove emoticons
+# Clean text to remove odd characters (not working!)
+
+polit_tweets$text <- sapply(polit_tweets$text,function(row) iconv(row, "latin1", "ASCII", sub=""))
+
+head(polit_tweets)
+nrow(polit_tweets)
+
+```
+
+
+```{r}
+# Remove retweets 
+polit_tweets_organic <- polit_tweets[polit_tweets$isRetweet==FALSE, ] 
+head(polit_tweets_organic)
+nrow(polit_tweets_organic)
+
+# Remove replies
+polit_tweets_organic <- subset(polit_tweets_organic, is.na(polit_tweets_organic$replyToSID)) 
+
+```
+
+
+```{r}
+#remove duplicate tweets..
+data("stop_words")
+
+# get a list of words
+polit_tweets_organic_clean <- polit_tweets_organic %>%
+  dplyr::select(text, day, party_area) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  filter(!word %in% c("rt", "t.co"))
+
+head(polit_tweets_organic_clean)
+dim(polit_tweets_organic_clean)
+polit_tweets_organic_clean[order(polit_tweets_organic_clean$word),]
+
+```
+
+
+```{r}
+# plot the top 15 words -
+polit_tweets_organic_clean %>%
+  count(word, sort = TRUE) %>%
+  top_n(20) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() +
+  labs(x = "Count",
+       y = "Unique words",
+       title = "Count of unique words found in tweets")
+
+```
+
+Next, join the words extracted from the tweets with the sentiment data. The "bing" sentiment data classifies words as positive or negative. In order to use other sentiment lexicons see [here](https://www.tidytextmining.com/sentiment.html#the-sentiments-dataset).
+
+```{r}
+# join sentiment classification to the tweet words
+bing_word_counts <- polit_tweets_organic_clean %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, day, party_area, sort = TRUE) %>%
+  group_by(sentiment) %>%
+  ungroup() %>%
+  mutate(word = reorder(word, n)) %>%
+  group_by(day, sentiment) %>%
+  top_n(n = 5, wt = n) %>%
+  # create a date / sentiment column for sorting
+  mutate(senti_date_party = paste0(sentiment,"-", day, "-", party_area)) %>%
+  arrange(party_area, desc(sentiment), n)
+
+head(bing_word_counts)
+```
+
+
+```{r}
+bing_word_counts$senti_date_party <- factor(bing_word_counts$senti_date_party,
+       levels = unique(bing_word_counts$senti_date_party))
+
+# group by month and sentiment and then plot top 5 words each month
+bing_word_counts %>%
+  ggplot(aes(word, n, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~senti_date_party, scales = "free_y", ncol = 2) +
+  labs(title = "Positive and negative sentiment for each political party",
+       y = "Number of Times Word Appeared in Tweets",
+       x = NULL) +
+  coord_flip()
+```
+
+```{r}
+
+
+```
+
+
+
+
+# Sentiment analysis
+
+```{r}
+#read-in data
+
+```
+
 
 #Materials:
 1. textmining and sentiment analysis

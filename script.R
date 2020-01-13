@@ -3,6 +3,7 @@
 #https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/sentiment-analysis-of-twitter-data-r/  #for sentiment analysis
 #get sentiment dictionary/lexicon https://www.tidytextmining.com/sentiment.html#the-sentiments-dataset 
 #https://brexit.foraction.gr/
+#https://towardsdatascience.com/a-guide-to-mining-and-analysing-tweets-with-r-2f56818fdd16
 
 setwd("C:/Users/monsu/Desktop/software paper/")
 
@@ -132,6 +133,12 @@ testit(1200)
 #}
 
 }
+
+#------------------------------------------------------
+#read in a download
+
+
+
 
 
 
