@@ -1,0 +1,149 @@
+---
+title: "Twitter-based analysis of political sentiments - A case of Brexit"
+
+author: |
+  | `Authors:`
+  | `Adepeju, M.`
+  | `Crime and Big Data Centre, Manchester Metropolitan University, Manchester, M15 6BH`
+  
+date: |
+  | `Date:`
+  | ``r Sys.Date()``
+
+output:
+  rmarkdown::html_vignette
+  
+#dev: png
+#output:
+  #word_document: default
+  #always_allow_html: yes
+#  pdf_document: default
+always_allow_html: yes
+#fig_caption: yes
+##bibliography: references.bib
+
+abstract: The .
+  
+vignette: >
+  %\VignetteIndexEntry{Twitter-based analysis of political sentiments - A case of Brexit}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+<style type="text/css">
+
+h1.title {
+  font-size: 26px;
+  line-height: 130%;
+  color: Black;
+  text-align: center;
+}
+
+h2.subtitle {
+  font-size: 13px;
+  line-height: 120%;
+  color: Black;
+  text-align: center;
+}
+
+h4.author { /* Header 4 - and the author and data headers use this too  */
+  font-size: 17px;
+  font-family: "Arial";
+  color: Black;
+  text-align: center;
+}
+h4.date { /* Header 4 - and the author and data headers use this too  */
+  font-size: 17px;
+  font-family: "Arial", Times, serif;
+  color: Black;
+  text-align: center;
+}
+
+h4.abstract { /* Header 4 - and the author and data headers use this too  */
+  font-size: 10px;
+  font-family: "Arial", Times, serif;
+  color: black;
+  text-align: center;
+}
+
+h4.institute{ /* Header 4 - and the author and data headers use this too  */
+  font-size: 10px;
+  font-family: "Arial", Times, serif;
+  color: black;
+  text-align: center;
+}
+
+body, td {
+   font-size: 14px;
+}
+code.r{
+  font-size: 13px;
+}
+pre {
+  font-size: 13px
+}
+h1 { /* Header 1 */
+  font-size: 16px;
+  color: DarkBlue;
+}
+h2 { /* Header 2 */
+    font-size: 16px;
+  color: DarkBlue;
+}
+h3 { /* Header 3 */
+  font-size: 15px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlue;
+
+</style>
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r functions, include=FALSE}
+# A function for captioning and referencing images
+fig <- local({
+    i <- 0
+    ref <- list()
+    list(
+        cap=function(refName, text) {
+            i <<- i + 1
+            ref[[refName]] <<- i
+            paste("Figure ", i, ": ", text, sep="")
+        },
+        ref=function(refName) {
+            ref[[refName]]
+        })
+})
+```
+
+# Introduction
+
+Longitudinal 
+
+```{r, echo=FALSE, include=FALSE}
+library(rtweet)
+library(ggplot2)
+library(dplyr)
+library(tidytext)
+library(twitteR)
+library(ROAuth)
+library(NLP)
+library(twitteR)
+library(syuzhet)
+library(tm)
+library(SnowballC)
+library(stringi)
+library(topicmodels)
+library(lubridate)
+```
+
+#Experimental design
+```{r, echo=FALSE, include=FALSE}
+
+```
+
