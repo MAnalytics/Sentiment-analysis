@@ -67,7 +67,7 @@ p_area <- data.frame(st_as_sf(shp))
 unique_party <- as.character(unique(p_area$Party))
 
 #create time sequence
-dates <- seq.Date(from = as.Date('2020-01-11 00:00:00'), to = as.Date('2020-01-12 00:00:00'), by = 'days') 
+dates <- seq.Date(from = as.Date('2020-01-08 00:00:00'), to = as.Date('2020-01-09 00:00:00'), by = 'days') 
 
 #keywords to search in tweets
 hashtags <- '#brexit + brexit'
@@ -107,7 +107,7 @@ tweets_g <- searchTwitter(hashtags, n=1000, lang = "en",
                               )
                               if(length(tweets_g)!=0){
                                   tweets_g <- twListToDF(tweets_g)
-                                  tweets_g <- data.frame(cbind(tweets_g, i, Long=sub_p_area_$long, lat=sub_p_area_$lat, from=as.character(dates[1]), to=as.character(dates[2])), party_area=unique_party[i])
+                                  tweets_g <- data.frame(cbind(tweets_g, i, long=sub_p_area_$long, lat=sub_p_area_$lat, from=as.character(dates[1]), to=as.character(dates[2])), party_area=unique_party[i])
                                   total_ <- total_ + nrow(tweets_g)
                                   
                                   flush.console()
@@ -122,41 +122,18 @@ tweets_g <- searchTwitter(hashtags, n=1000, lang = "en",
 
 #put system to sleep for 20 minutes after 10 calls (i.e. after data download for each party)
 #this is to prevent violating '15 calls per 15minutes' API download limit.
-#if(i == 2){
-testit(1200)
-#}
 
 write.table(all_Tweets, 
             file=paste("C:/Users/monsu/Documents/GitHub/Sentiment-analysis/","download_", as.character(dates[1]), "_to_", as.character(dates[2]), "_", unique_party[i], ".csv", sep=""), 
             sep=",", row.names = F)
 
+#if(i == 2){
+testit(1200)
+#}
+
 }
 
 
-
-
-
-tweets_g <- searchTwitter("radius2", n=5, lang = "en", 
-                          since='2020-01-13 00:00:00', until='2020-01-13 11:11:11', 
-                          geocode='53.474165,-2.35447,3.75mi')
-
-
-tweets_g <- searchTwitter("brexit", n=5, lang = "en", 
-                          since='2020-01-13 00:00:00', until='2020-01-13 11:24:11', 
-                          geocode='53.469,2.231,3.75mi')
-
-tweets_g <- searchTwitter("#downloadlatlongRadius2", n=5, lang = "en", 
-                                                  since='2020-01-13 00:00:00', until='2020-01-13 11:11:11', 
-                                                      geocode='53.474165,-2.35447,5mi')
-
-#home 53.451   -2.399
-tweets_g <- searchTwitter("#downloadlatlongRadius4", n=5, lang = "en", 
-                          since='2020-01-13 00:00:00', until='2020-01-13 12:29:00', 
-                          geocode='53.451,-2.399,25mi')
-#bdc
-tweets_g <- searchTwitter("#xperimenting", n=5, lang = "en", 
-                          since='2020-01-13 00:00:00', until='2020-01-13 12:29:11', 
-                          geocode='53.468,-2.238,25mi')
 
 #point_radius:
 # The point_radius: operator allows you to specify a circular geographic area and match Tweets 
@@ -166,41 +143,3 @@ tweets_g <- searchTwitter("#xperimenting", n=5, lang = "en",
 #fully within the defined point-radius area. Places whose polygons fall outside the defined point-radius 
 #area to any extent will not match.
 
-
-tweets_g <- twListToDF(tweets_g)
-
-write.table(tweets_g, "someth.csv", sep=",")
-#xperimenting
-getwd()
-tweets_g <- twListToDF(tweets_g)
-tweets_g[[1]]
-write.table(all_Tweets, 
-            file=paste("C:/Users/monsu/Documents/GitHub/Sentiment-analysis/","download_", as.character(dates[1]), "_to_", as.character(dates[2]), "_", unique_party[i], ".csv", sep=""), 
-            sep=",", row.names = F)
-
-
-#)
-
-#xperimenting
-
-
-
-
-
-head(all_Tweets)
-nrow(all_Tweets)
-
-nc[2,]
-
-t1 <- Sys.time()
-
-nc[1,]$long
-nc[1,]$lat
-nc[1,]$radiusT
-
-
-t2 <- Sys.time()
-print(t2-t1)
-tweets_g <- twListToDF(tweets_g)
-head(tweets_g)
-nrow(tweets_g)
