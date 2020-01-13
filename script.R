@@ -65,7 +65,7 @@ p_area <- data.frame(st_as_sf(shp))
 unique_party <- as.character(unique(p_area$Party))
 
 #create time sequence
-dates <- seq.Date(from = as.Date('2020-01-10 00:00:00'), to = as.Date('2020-01-11 00:00:00'), by = 'days') 
+dates <- seq.Date(from = as.Date('2020-01-11 00:00:00'), to = as.Date('2020-01-12 00:00:00'), by = 'days') 
 
 #keywords to search in tweets
 hashtags <- '#brexit + brexit'
@@ -127,7 +127,7 @@ testit(1200)
 #}
 
 write.table(all_Tweets, 
-            file=paste("C:/Users/monsu/Desktop/software paper/downloads/","download_", as.character(dates[1]), "_to_", as.character(dates[2]), "_", unique_party[i], ".csv", sep=""), 
+            file=paste("C:/Users/monsu/Documents/GitHub/Sentiment-analysis/","download_", as.character(dates[1]), "_to_", as.character(dates[2]), "_", unique_party[i], ".csv", sep=""), 
             sep=",", row.names = F)
 
 }
