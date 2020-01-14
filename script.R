@@ -5,6 +5,8 @@
 #https://brexit.foraction.gr/
 #https://towardsdatascience.com/a-guide-to-mining-and-analysing-tweets-with-r-2f56818fdd16
 
+#https://www.r-bloggers.com/twitter-data-analysis-in-r/      #very good! equation for sentiment score.
+
 setwd("C:/Users/monsu/Desktop/software paper/")
 
 ## load rtweet
@@ -16,6 +18,7 @@ library(tidytext)
 
 #post_tweet("Trying tweeting from within R! ")
 ## your tweet has been posted!
+
 
 
 install.packages("twitteR")
@@ -68,7 +71,7 @@ p_area <- data.frame(st_as_sf(shp))
 unique_party <- as.character(unique(p_area$Party))
 
 #create time sequence
-dates <- seq.Date(from = as.Date('2020-01-08 00:00:00'), to = as.Date('2020-01-09 00:00:00'), by = 'days') 
+dates <- seq.Date(from = as.Date('2020-01-07 00:00:00'), to = as.Date('2020-01-08 00:00:00'), by = 'days') 
 
 #keywords to search in tweets
 hashtags <- '#brexit + brexit'
@@ -136,9 +139,6 @@ testit(1200)
 
 #------------------------------------------------------
 #read in a download
-
-
-
 
 
 

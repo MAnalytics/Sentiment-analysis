@@ -142,6 +142,7 @@ library(SnowballC)
 library(stringi)
 library(topicmodels)
 library(lubridate)
+library(stringr)
 ```
 
 # Research objectives
@@ -192,39 +193,37 @@ knitr::kable(tble, caption = "Table 1. `Data manipulation` functions", col.names
 #read-in data
 
 #append all downloaded data set
-polit_tweets_ <- read.csv(file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/downloads/download_2020-01-10_to_2020-01-11_Others.csv", sep=",", head=TRUE)
+#polit_tweets_ <- read.csv(file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/downloads/download_2020-01-10_to_2020-01-11_Others.csv", sep=",", head=TRUE)
+
 filenames <- list.files(path = "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/downloads/", pattern = "*", full.names=TRUE)
 polit_tweets_ <- ldply(filenames, read.csv)
-head(polit_tweets_)
-
-#cleaning 1: remove 'https:/....'
-polit_tweets <- polit_tweets_ %>% 
-    mutate(day=as.Date(as.character(substr(created,1,10)), format = "%d")) %>%
-    mutate(text = gsub("http://*|https://*)", "", text))
-
-#convert to data.frame
-polit_tweets <- data.frame(polit_tweets)
-
-             
-#remove emoticons
-# Clean text to remove odd characters (not working!)
-
-polit_tweets$text <- sapply(polit_tweets$text,function(row) iconv(row, "latin1", "ASCII", sub=""))
-
-head(polit_tweets)
-nrow(polit_tweets)
+#head(polit_tweets_)
 
 ```
 
 
 ```{r}
 # Remove retweets 
-polit_tweets_organic <- polit_tweets[polit_tweets$isRetweet==FALSE, ] 
-head(polit_tweets_organic)
+polit_tweets_organic <- polit_tweets_[polit_tweets_$isRetweet==FALSE, ] 
+#head(polit_tweets_organic)
 nrow(polit_tweets_organic)
 
 # Remove replies
 polit_tweets_organic <- subset(polit_tweets_organic, is.na(polit_tweets_organic$replyToSID)) 
+
+#remove 'https:/....'
+polit_tweets_organic <- polit_tweets_organic %>% 
+    mutate(day=as.Date(as.character(substr(created,1,10)), format = "%d")) %>%
+    mutate(text=str_replace_all(text, "[[:punct:]]", " ")) %>%
+    mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text))
+  
+#convert to data.frame
+#polit_tweets <- data.frame(polit_tweets)
+
+#remove emoticons
+polit_tweets_organic$text <- sapply(polit_tweets_organic$text,function(row) iconv(row, "latin1", "ASCII", sub=""))
+#head(polit_tweets_organic)
+nrow(polit_tweets_organic)
 
 ```
 
@@ -240,9 +239,9 @@ polit_tweets_organic_clean <- polit_tweets_organic %>%
   anti_join(stop_words) %>%
   filter(!word %in% c("rt", "t.co"))
 
-head(polit_tweets_organic_clean)
+#head(polit_tweets_organic_clean)
 dim(polit_tweets_organic_clean)
-polit_tweets_organic_clean[order(polit_tweets_organic_clean$word),]
+#polit_tweets_organic_clean[order(polit_tweets_organic_clean$word),]
 
 ```
 
@@ -250,7 +249,7 @@ polit_tweets_organic_clean[order(polit_tweets_organic_clean$word),]
 ```{r}
 # plot the top 15 words -
 polit_tweets_organic_clean %>%
-  count(word, sort = TRUE) %>%
+  dplyr::count(word, sort = TRUE) %>%
   top_n(20) %>%
   mutate(word = reorder(word, n)) %>%
   ggplot(aes(x = word, y = n)) +
@@ -269,14 +268,14 @@ Next, join the words extracted from the tweets with the sentiment data. The "bin
 # join sentiment classification to the tweet words
 bing_word_counts <- polit_tweets_organic_clean %>%
   inner_join(get_sentiments("bing")) %>%
-  count(word, sentiment, day, party_area, sort = TRUE) %>%
+  dplyr::count(word, sentiment, party_area, sort = TRUE) %>%
   group_by(sentiment) %>%
   ungroup() %>%
   mutate(word = reorder(word, n)) %>%
-  group_by(day, sentiment) %>%
+  group_by(sentiment) %>%
   top_n(n = 5, wt = n) %>%
   # create a date / sentiment column for sorting
-  mutate(senti_date_party = paste0(sentiment,"-", day, "-", party_area)) %>%
+  mutate(senti_party = paste0(sentiment,"-", party_area)) %>%
   arrange(party_area, desc(sentiment), n)
 
 head(bing_word_counts)
@@ -284,15 +283,15 @@ head(bing_word_counts)
 
 
 ```{r}
-bing_word_counts$senti_date_party <- factor(bing_word_counts$senti_date_party,
-       levels = unique(bing_word_counts$senti_date_party))
+bing_word_counts$senti_party <- factor(bing_word_counts$senti_party,
+       levels = unique(bing_word_counts$senti_party))
 
 # group by month and sentiment and then plot top 5 words each month
 bing_word_counts %>%
   ggplot(aes(word, n, fill = sentiment)) +
   geom_col(show.legend = FALSE) +
-  facet_wrap(~senti_date_party, scales = "free_y", ncol = 2) +
-  labs(title = "Positive and negative sentiment for each political party",
+  facet_wrap(~senti_party, scales = "free_y", ncol = 2) +
+  labs(title = "Positive and negative sentiment across different areas",
        y = "Number of Times Word Appeared in Tweets",
        x = NULL) +
   coord_flip()
