@@ -10,25 +10,10 @@
 setwd("C:/Users/monsu/Desktop/software paper/")
 
 ## load rtweet
-install.packages("rtweet")
 library(rtweet)
 library(ggplot2)
 library(dplyr)
 library(tidytext)
-
-#post_tweet("Trying tweeting from within R! ")
-## your tweet has been posted!
-
-
-
-install.packages("twitteR")
-install.packages("ROAuth")
-install.packages("syuzhet")
-install.packages("tm")
-install.packages("SnowballC")
-install.packages("stringi")
-install.packages("topicmodels")
-install.packages("syuzhet")
 library(twitteR)
 library(ROAuth)
 library(NLP)#, lib.loc="~/R/win-library/3.3")
@@ -41,16 +26,28 @@ library(topicmodels)
 library(lubridate)
 
 #setting up twitter
+library(rtweet)
 consumer_key <- 'rJWorDnMoARYE7OUTqaz0rOo4'
 consumer_secret <- 'dUJktwlOwdbaUNB15z2Yw4HI3piOd1aTevADmathrNhBdLC3ny'
 access_token <- '1108852279434715136-4IpdsZ2t69wcj0GZ3ricwL8XsU0RzT'
 access_secret <- 'eX78KEUNtaU6GZ0wFay5lafhbzeZhuLzHkq71RxKnt9xj'
 setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
 
+token <- create_token(
+  app = "UK2019",
+  consumer_key = consumer_key,
+  consumer_secret = consumer_secret)
+
 #function to pick random row in a dataframe
-pickRandomRows = function(df, numberOfRows = 13) {
+pickRandomRows1 = function(df, numberOfRows = 5) {
 df %>% dplyr::slice(sample(1:length(df[,1]), numberOfRows, replace=FALSE))
 }
+
+#function to pick random row in a dataframe
+pickRandomRows2 = function(df, numberOfRows = 2) {
+  df %>% dplyr::slice(sample(1:length(df[,1]), numberOfRows, replace=FALSE))
+}
+
 
 #function to put system to sleep for an x number of seconds
 testit <- function(x){
@@ -62,6 +59,7 @@ testit <- function(x){
 #import shapefiles
 library(sf)
 library(rgdal)
+#shp <- readOGR(dsn=".", "latLongRadius")  #head
 shp <- readOGR(dsn=".", "latLongRadius")  #head
 p_area <- data.frame(st_as_sf(shp))
 
@@ -71,7 +69,7 @@ p_area <- data.frame(st_as_sf(shp))
 unique_party <- as.character(unique(p_area$Party))
 
 #create time sequence
-dates <- seq.Date(from = as.Date('2020-01-07 00:00:00'), to = as.Date('2020-01-08 00:00:00'), by = 'days') 
+dates <- seq.Date(from = as.Date('2020-01-12 00:00:00'), to = as.Date('2020-01-13 00:00:00'), by = 'days') 
 
 #keywords to search in tweets
 hashtags <- '#brexit + brexit'
@@ -140,6 +138,27 @@ testit(1200)
 #------------------------------------------------------
 #read in a download
 
+
+
+#53.449123, -2.3965435
+
+write_as_csv(tweets_g, "another.csv", na="NA", fileEncoding = "UTF-8")
+
+toDate <- format(Sys.time() - 60 * 60 * 24 * 7, "%Y%m%d%H%M")
+
+tweets_g <- search_tweets("brexit", n=1000, type="mixed", include_rts=TRUE, 
+                          token = token, lang="en",
+                          fromDate="202001111420", toDate="202001141425", 
+                          geocode='53.468234,-2.23912453,1mi')
+
+tweets_g <- search_tweets("brexit", n=1000, type="mixed", include_rts=TRUE, 
+                          token = token, lang="en",
+                          fromDate="202001111420", toDate="202001141425", 
+                          place="Leeds")
+
+tweets_g
+
+write_as_csv(tweets_g, "another3.csv", na="NA", fileEncoding = "UTF-8")
 
 
 #point_radius:
