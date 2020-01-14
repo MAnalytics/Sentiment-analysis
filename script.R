@@ -38,15 +38,15 @@ token <- create_token(
   consumer_key = consumer_key,
   consumer_secret = consumer_secret)
 
-#function to pick random row in a dataframe
-pickRandomRows1 = function(df, numberOfRows = 5) {
-df %>% dplyr::slice(sample(1:length(df[,1]), numberOfRows, replace=FALSE))
-}
-
-#function to pick random row in a dataframe
-pickRandomRows2 = function(df, numberOfRows = 2) {
-  df %>% dplyr::slice(sample(1:length(df[,1]), numberOfRows, replace=FALSE))
-}
+# #function to pick random row in a dataframe
+# pickRandomRows1 = function(df, numberOfRows = 5) {
+# df %>% dplyr::slice(sample(1:length(df[,1]), numberOfRows, replace=FALSE))
+# }
+# 
+# #function to pick random row in a dataframe
+# pickRandomRows2 = function(df, numberOfRows = 2) {
+#   df %>% dplyr::slice(sample(1:length(df[,1]), numberOfRows, replace=FALSE))
+# }
 
 
 #function to put system to sleep for an x number of seconds
@@ -60,20 +60,20 @@ testit <- function(x){
 library(sf)
 library(rgdal)
 #shp <- readOGR(dsn=".", "latLongRadius")  #head
-shp <- readOGR(dsn=".", "latLongRadius")  #head
+shp <- readOGR(dsn=".", "CirclesByVoting")  #head
 p_area <- data.frame(st_as_sf(shp))
 
 #p_area %>% select(Party) %>% filter(Party=="Liberal Democrats")
 
 #unique party names
 unique_party <- as.character(unique(p_area$Party))
+unique_party <- c(unique_party[2], unique_party[1], unique_party[3], unique_party[5], unique_party[4])
 
 #create time sequence
-dates <- seq.Date(from = as.Date('2020-01-12 00:00:00'), to = as.Date('2020-01-13 00:00:00'), by = 'days') 
+#dates <- seq.Date(from = as.Date('2020-01-12 00:00:00'), to = as.Date('2020-01-13 00:00:00'), by = 'days') 
 
 #keywords to search in tweets
-hashtags <- '#brexit + brexit'
-
+hashtags <- 'brexit'
 
 #loop through each party name
 #collect all points [Lat, Long, & radius] drawn in the area belonging to the party.
@@ -87,47 +87,45 @@ total_ <- 0
 all_Tweets <- NULL
 
 #Given a party  
-for(i in 1:length(unique_party)){ #i<-3
+for(i in 1:length(unique_party)){ #i<-1
  
-#5 random points
-p_area_ <- 
-    p_area %>% 
-    dplyr::filter(Party==unique_party[i]) %>%
-    pickRandomRows()
+# if(i %in% c(1, 2, 4, 5)){
+# #5 random points 
+# p_area_ <- 
+#     p_area %>% 
+#     dplyr::filter(Party==unique_party[i]) %>%
+#     pickRandomRows1()
+# }
+#   
+# if(!i %in% c(1, 2, 4, 5)){
+# #for Lib Dem
+# p_area_ <- 
+#   p_area %>% 
+#   dplyr::filter(Party==unique_party[i]) %>%
+#   pickRandomRows2()
+# }
 
 #loop through the selected five points   
 for(j in 1:nrow(p_area_)){  #j<-1
 
 #a point 
 sub_p_area_ <- p_area_[j, ]
-  
-tweets_g <- searchTwitter(hashtags, n=1000, lang = "en", 
-                since=as.character(dates[1]), until=as.character(dates[2]), 
-                geocode=paste(sub_p_area_$long,
-                              sub_p_area_$lat,
-                              paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
-                              )
-                              if(length(tweets_g)!=0){
-                                  tweets_g <- twListToDF(tweets_g)
-                                  tweets_g <- data.frame(cbind(tweets_g, i, long=sub_p_area_$long, lat=sub_p_area_$lat, from=as.character(dates[1]), to=as.character(dates[2])), party_area=unique_party[i])
-                                  total_ <- total_ + nrow(tweets_g)
-                                  
-                                  flush.console()
-                                  print(paste(i, j, sep="|"))
-                                  print(nrow(tweets_g))
-                                  flush.console()
-                                  print(total_)
-      
-      all_Tweets <- rbind(all_Tweets, tweets_g)
+
+tweets_g <- search_tweets("brexit", n=5000, type="mixed", include_rts=TRUE, 
+                          token = token, lang="en",
+                          geocode=paste(sub_p_area_$long,
+                                        sub_p_area_$lat,
+                                        paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
+                                        )
+      all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
+      nrow(all_Tweets)
       }
-}
+#}
 
 #put system to sleep for 20 minutes after 10 calls (i.e. after data download for each party)
 #this is to prevent violating '15 calls per 15minutes' API download limit.
 
-write.table(all_Tweets, 
-            file=paste("C:/Users/monsu/Documents/GitHub/Sentiment-analysis/","download_", as.character(dates[1]), "_to_", as.character(dates[2]), "_", unique_party[i], ".csv", sep=""), 
-            sep=",", row.names = F)
+write_as_csv(all_Tweets, paste("C:/Users/monsu/Documents/GitHub/Sentiment-analysis/",unique_party[i],"download_0106_0107.csv", sep="_"), na="NA", fileEncoding = "UTF-8")
 
 #if(i == 2){
 testit(1200)
@@ -135,21 +133,47 @@ testit(1200)
 
 }
 
-#------------------------------------------------------
-#read in a download
+getwd()
+#download data by Vountry
+#----------------------------------------------------
+#----------------------------------------------------
+#----------------------------------------------------
+#----------------------------------------------------
 
+#to download the tweet of the last 'whatever' days 
+#at this first circle for the conservative
+#no need to add the fromDate toDate as they seem to not doing anything
+#-------------------------------------------------------------------------------
+sub_p_area_ <- p_area_[j, ]
+
+tweets_g <- search_tweets("brexit", n=5000, type="mixed", include_rts=TRUE, 
+                          token = token, lang="en",
+                          geocode=paste(sub_p_area_$long,
+                                        sub_p_area_$lat,
+                                        paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
+)
+tweets_g  #all_Tweets<-NULL 121x90
+min(tweets_g$created_at)  #"2020-01-06 21:53:39 UTC"
+max(tweets_g$created_at)  #"2020-01-14 22:02:08 UTC"
+write_as_csv(tweets_g, "download_14012020.csv", na="NA", fileEncoding = "UTF-8")
+
+nrow(all_Tweets)
+#}
+#-------------------------------------------------------------------------------
+
+write_as_csv(tweets_g, "another.csv", na="NA", fileEncoding = "UTF-8")
+
+
+
+
+write.table(all_Tweets, 
+            file=paste("C:/Users/monsu/Documents/GitHub/Sentiment-analysis/","download_", as.character(dates[1]), "_to_", as.character(dates[2]), "_", unique_party[i], ".csv", sep=""), 
+            sep=",", row.names = F)
 
 
 #53.449123, -2.3965435
 
-write_as_csv(tweets_g, "another.csv", na="NA", fileEncoding = "UTF-8")
 
-toDate <- format(Sys.time() - 60 * 60 * 24 * 7, "%Y%m%d%H%M")
-
-tweets_g <- search_tweets("brexit", n=1000, type="mixed", include_rts=TRUE, 
-                          token = token, lang="en",
-                          fromDate="202001111420", toDate="202001141425", 
-                          geocode='53.468234,-2.23912453,1mi')
 
 tweets_g <- search_tweets("brexit", n=1000, type="mixed", include_rts=TRUE, 
                           token = token, lang="en",

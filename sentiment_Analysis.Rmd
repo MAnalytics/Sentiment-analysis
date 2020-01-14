@@ -159,12 +159,12 @@ The Twitter API is used to download tweets from different geographical areas acr
 knitr::include_graphics("UKelectionResult.png")
 ```
 
-```{r figs2, echo=FALSE, fig.cap=fig$cap("figs1", "Data download strategy (by party success)"), out.width = '60%', fig.align="center"} 
-knitr::include_graphics("DataCollectionStrategy1.png")
+```{r figs2, echo=FALSE, fig.cap=fig$cap("figs1", "Data download (by Country)"), out.width = '60%', fig.align="center"} 
+knitr::include_graphics("DatacollectionbyCountry.png")
 ```
 
-```{r figs3, echo=FALSE, fig.cap=fig$cap("figs1", "Data download strategy (by Country)"), out.width = '60%', fig.align="center"} 
-knitr::include_graphics("DataCollectionStrategy2.png")
+```{r figs3, echo=FALSE, fig.cap=fig$cap("figs1", "Data download (by Voting results)"), out.width = '60%', fig.align="center"} 
+knitr::include_graphics("DatacollectionbyVoting.png")
 ```
 
 ```{r, echo=FALSE, include=FALSE}
