@@ -153,10 +153,18 @@ library(stringr)
 
 # Data download strategy
 
-The Twitter API is used to download tweets from different geographical areas across the UK. Figure `r fig$ref("figs1")`shows the data download strategy, which involves drawing sets of circles over areas that are now controlled by different political parties based on the last general elections (held on the 12th Dec. 2019). This enables us to download tweets that were tweeted in different areas across the country. Owing to the twitter download constraints, we randomly pick 12 circles from each political area each day and download all tweets that include the keywords `#Brexit` or `brexit`. The download covers from `Jan 1, 2020` to `Feb 29, 2020`. Table xx shows the total number tweets downloaded for each political area over the study period.   
+The Twitter API is used to download tweets from different geographical areas across the UK. Figure `r fig$ref("figs1")`, Figure `r fig$ref("figs2")`, Figure `r fig$ref("figs2")` shows the data download strategy, which involves drawing sets of circles over areas that are now controlled by different political parties based on the last general elections (held on the 12th Dec. 2019). This enables us to download tweets that were tweeted in different areas across the country. Owing to the twitter download constraints, we randomly pick 12 circles from each political area each day and download all tweets that include the keywords `#Brexit` or `brexit`. The download covers from `Jan 1, 2020` to `Feb 29, 2020`. Table xx shows the total number tweets downloaded for each political area over the study period.   
 
-```{r figs1, echo=FALSE, fig.cap=fig$cap("figs1", "Data Collection Design"), out.width = '60%', fig.align="center"} 
-knitr::include_graphics("dataextraction.png")
+```{r figs1, echo=FALSE, fig.cap=fig$cap("figs1", "UK 2019 General Election Results"), out.width = '60%', fig.align="center"} 
+knitr::include_graphics("UKelectionResult.png")
+```
+
+```{r figs2, echo=FALSE, fig.cap=fig$cap("figs1", "Data download strategy (by party success)"), out.width = '60%', fig.align="center"} 
+knitr::include_graphics("DataCollectionStrategy1.png")
+```
+
+```{r figs3, echo=FALSE, fig.cap=fig$cap("figs1", "Data download strategy (by Country)"), out.width = '60%', fig.align="center"} 
+knitr::include_graphics("DataCollectionStrategy2.png")
 ```
 
 ```{r, echo=FALSE, include=FALSE}
@@ -190,111 +198,111 @@ knitr::kable(tble, caption = "Table 1. `Data manipulation` functions", col.names
 # Data exploration
 
 ```{r}
-#read-in data
-
-#append all downloaded data set
-#polit_tweets_ <- read.csv(file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/downloads/download_2020-01-10_to_2020-01-11_Others.csv", sep=",", head=TRUE)
-
-filenames <- list.files(path = "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/downloads/", pattern = "*", full.names=TRUE)
-polit_tweets_ <- ldply(filenames, read.csv)
-#head(polit_tweets_)
-
-```
-
-
-```{r}
-# Remove retweets 
-polit_tweets_organic <- polit_tweets_[polit_tweets_$isRetweet==FALSE, ] 
-#head(polit_tweets_organic)
-nrow(polit_tweets_organic)
-
-# Remove replies
-polit_tweets_organic <- subset(polit_tweets_organic, is.na(polit_tweets_organic$replyToSID)) 
-
-#remove 'https:/....'
-polit_tweets_organic <- polit_tweets_organic %>% 
-    mutate(day=as.Date(as.character(substr(created,1,10)), format = "%d")) %>%
-    mutate(text=str_replace_all(text, "[[:punct:]]", " ")) %>%
-    mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text))
-  
-#convert to data.frame
-#polit_tweets <- data.frame(polit_tweets)
-
-#remove emoticons
-polit_tweets_organic$text <- sapply(polit_tweets_organic$text,function(row) iconv(row, "latin1", "ASCII", sub=""))
-#head(polit_tweets_organic)
-nrow(polit_tweets_organic)
+# #read-in data
+# 
+# #append all downloaded data set
+# #polit_tweets_ <- read.csv(file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/downloads/download_2020-01-10_to_2020-01-11_Others.csv", sep=",", head=TRUE)
+# 
+# filenames <- list.files(path = "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/downloads/", pattern = "*", full.names=TRUE)
+# polit_tweets_ <- ldply(filenames, read.csv)
+# #head(polit_tweets_)
 
 ```
 
 
 ```{r}
-#remove duplicate tweets..
-data("stop_words")
-
-# get a list of words
-polit_tweets_organic_clean <- polit_tweets_organic %>%
-  dplyr::select(text, day, party_area) %>%
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words) %>%
-  filter(!word %in% c("rt", "t.co"))
-
-#head(polit_tweets_organic_clean)
-dim(polit_tweets_organic_clean)
-#polit_tweets_organic_clean[order(polit_tweets_organic_clean$word),]
+# # Remove retweets 
+# polit_tweets_organic <- polit_tweets_[polit_tweets_$isRetweet==FALSE, ] 
+# #head(polit_tweets_organic)
+# nrow(polit_tweets_organic)
+# 
+# # Remove replies
+# polit_tweets_organic <- subset(polit_tweets_organic, is.na(polit_tweets_organic$replyToSID)) 
+# 
+# #remove 'https:/....'
+# polit_tweets_organic <- polit_tweets_organic %>% 
+#     mutate(day=as.Date(as.character(substr(created,1,10)), format = "%d")) %>%
+#     mutate(text=str_replace_all(text, "[[:punct:]]", " ")) %>%
+#     mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text))
+#   
+# #convert to data.frame
+# #polit_tweets <- data.frame(polit_tweets)
+# 
+# #remove emoticons
+# polit_tweets_organic$text <- sapply(polit_tweets_organic$text,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# #head(polit_tweets_organic)
+# nrow(polit_tweets_organic)
 
 ```
 
 
 ```{r}
-# plot the top 15 words -
-polit_tweets_organic_clean %>%
-  dplyr::count(word, sort = TRUE) %>%
-  top_n(20) %>%
-  mutate(word = reorder(word, n)) %>%
-  ggplot(aes(x = word, y = n)) +
-  geom_col() +
-  xlab(NULL) +
-  coord_flip() +
-  labs(x = "Count",
-       y = "Unique words",
-       title = "Count of unique words found in tweets")
+# #remove duplicate tweets..
+# data("stop_words")
+# 
+# # get a list of words
+# polit_tweets_organic_clean <- polit_tweets_organic %>%
+#   dplyr::select(text, day, party_area) %>%
+#   unnest_tokens(word, text) %>%
+#   anti_join(stop_words) %>%
+#   filter(!word %in% c("rt", "t.co"))
+# 
+# #head(polit_tweets_organic_clean)
+# dim(polit_tweets_organic_clean)
+# #polit_tweets_organic_clean[order(polit_tweets_organic_clean$word),]
+
+```
+
+
+```{r}
+# # plot the top 15 words -
+# polit_tweets_organic_clean %>%
+#   dplyr::count(word, sort = TRUE) %>%
+#   top_n(20) %>%
+#   mutate(word = reorder(word, n)) %>%
+#   ggplot(aes(x = word, y = n)) +
+#   geom_col() +
+#   xlab(NULL) +
+#   coord_flip() +
+#   labs(x = "Count",
+#        y = "Unique words",
+#        title = "Count of unique words found in tweets")
 
 ```
 
 Next, join the words extracted from the tweets with the sentiment data. The "bing" sentiment data classifies words as positive or negative. In order to use other sentiment lexicons see [here](https://www.tidytextmining.com/sentiment.html#the-sentiments-dataset).
 
 ```{r}
-# join sentiment classification to the tweet words
-bing_word_counts <- polit_tweets_organic_clean %>%
-  inner_join(get_sentiments("bing")) %>%
-  dplyr::count(word, sentiment, party_area, sort = TRUE) %>%
-  group_by(sentiment) %>%
-  ungroup() %>%
-  mutate(word = reorder(word, n)) %>%
-  group_by(sentiment) %>%
-  top_n(n = 5, wt = n) %>%
-  # create a date / sentiment column for sorting
-  mutate(senti_party = paste0(sentiment,"-", party_area)) %>%
-  arrange(party_area, desc(sentiment), n)
-
-head(bing_word_counts)
+# # join sentiment classification to the tweet words
+# bing_word_counts <- polit_tweets_organic_clean %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   dplyr::count(word, sentiment, party_area, sort = TRUE) %>%
+#   group_by(sentiment) %>%
+#   ungroup() %>%
+#   mutate(word = reorder(word, n)) %>%
+#   group_by(sentiment) %>%
+#   top_n(n = 5, wt = n) %>%
+#   # create a date / sentiment column for sorting
+#   mutate(senti_party = paste0(sentiment,"-", party_area)) %>%
+#   arrange(party_area, desc(sentiment), n)
+# 
+# head(bing_word_counts)
 ```
 
 
 ```{r}
-bing_word_counts$senti_party <- factor(bing_word_counts$senti_party,
-       levels = unique(bing_word_counts$senti_party))
-
-# group by month and sentiment and then plot top 5 words each month
-bing_word_counts %>%
-  ggplot(aes(word, n, fill = sentiment)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~senti_party, scales = "free_y", ncol = 2) +
-  labs(title = "Positive and negative sentiment across different areas",
-       y = "Number of Times Word Appeared in Tweets",
-       x = NULL) +
-  coord_flip()
+# bing_word_counts$senti_party <- factor(bing_word_counts$senti_party,
+#        levels = unique(bing_word_counts$senti_party))
+# 
+# # group by month and sentiment and then plot top 5 words each month
+# bing_word_counts %>%
+#   ggplot(aes(word, n, fill = sentiment)) +
+#   geom_col(show.legend = FALSE) +
+#   facet_wrap(~senti_party, scales = "free_y", ncol = 2) +
+#   labs(title = "Positive and negative sentiment across different areas",
+#        y = "Number of Times Word Appeared in Tweets",
+#        x = NULL) +
+#   coord_flip()
 ```
 
 ```{r}
