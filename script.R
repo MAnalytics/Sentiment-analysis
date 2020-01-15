@@ -24,6 +24,8 @@ library(SnowballC)#", lib.loc="~/R/win-library/3.3")
 library(stringi)#", lib.loc="~/R/win-library/3.3")
 library(topicmodels)
 library(lubridate)
+library(sf)
+library(rgdal)
 
 #setting up twitter
 library(rtweet)
@@ -56,14 +58,88 @@ testit <- function(x){
   proc.time() - p1 # The cpu usage should be negligible
 }
 
+
+#Data download by Country
+#----------------------------------------------------
+#----------------------------------------------------
+#----------------------------------------------------
+#----------------------------------------------------
 #import shapefiles
-library(sf)
-library(rgdal)
-#shp <- readOGR(dsn=".", "latLongRadius")  #head
-shp <- readOGR(dsn=".", "CirclesByVoting")  #head
+shp <- readOGR(dsn=".", "CirclesByCountry")  #head
 p_area <- data.frame(st_as_sf(shp))
 
-#p_area %>% select(Party) %>% filter(Party=="Liberal Democrats")
+#unique party names
+unique_country <- as.character(unique(p_area$Party))
+
+#keywords to search in tweets
+hashtags <- 'brexit'
+
+#loop through each party name
+#collect all points [Lat, Long, & radius] drawn in the area belonging to the party.
+#For each 'party_point', download n=10000 tweets that includes the 'hashtags'  
+
+#initialise (total tweets downloaded)
+total_ <- 0
+
+#tweets holder
+all_Tweets <- NULL
+
+#Given a party  
+for(i in 1:length(unique_country)){ #i<-1
+
+  # download data from all areas of each... 
+  p_area_ <- 
+    p_area %>% 
+    dplyr::filter(Party==unique_country[i])
+  
+  #----------------  
+  #loop through the selected five points   
+  for(j in 1:nrow(p_area_)){  #j<-1
+    
+    #a point 
+    sub_p_area_ <- p_area_[j, ]
+    
+    tweets_g <- search_tweets("brexit", n=5000, type="mixed", include_rts=TRUE, 
+                              token = token, lang="en",
+                              geocode=paste(sub_p_area_$long,
+                                            sub_p_area_$lat,
+                                            paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
+    )
+    if(nrow(tweets_g)!=0){
+    tweets_g <- tweets_g %>% mutate(class=unique_country[i])
+    all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
+    nrow(all_Tweets)
+    flush.console()
+    print(paste(i, j, sep="|"))
+    }
+  }
+  #}
+  
+  #put system to sleep for 20 minutes after 10 calls (i.e. after data download for each party)
+  #this is to prevent violating '15 calls per 15minutes' API download limit.
+  
+  #if(i == 2){
+  #testit(1200)
+  #}
+  
+}
+
+try(write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_2020-01-14_byCountry.csv", na="NA", fileEncoding = "UTF-8"), silent=TRUE)
+#write_as_csv(tweets_g, "try.csv", na="NA", fileEncoding = "UTF-8")
+# 
+#put system to sleep for 10 minutes
+testit(600)
+
+
+#Data download by Voting result
+#----------------------------------------------------
+#----------------------------------------------------
+#----------------------------------------------------
+#----------------------------------------------------
+
+#import shapefiles
+shp <- readOGR(dsn=".", "CirclesByVoting")  #head
+p_area <- data.frame(st_as_sf(shp))
 
 #unique party names
 unique_party <- as.character(unique(p_area$Party))
@@ -77,8 +153,7 @@ hashtags <- 'brexit'
 
 #loop through each party name
 #collect all points [Lat, Long, & radius] drawn in the area belonging to the party.
-#randomly select five (5) amongst the points ('party_points')
-#For each 'party_point', download n=1000 tweets that includes the 'keywords'  
+#For each 'party_point', download n=5000 tweets that includes the 'hashtags'  
 
 #initialise (total tweets downloaded)
 total_ <- 0
@@ -105,41 +180,47 @@ for(i in 1:length(unique_party)){ #i<-1
 #   pickRandomRows2()
 # }
 
+# download data from all areas of each... 
+p_area_ <- 
+     p_area %>% 
+     dplyr::filter(Party==unique_party[i])
+
+#----------------  
 #loop through the selected five points   
 for(j in 1:nrow(p_area_)){  #j<-1
-
-#a point 
-sub_p_area_ <- p_area_[j, ]
-
-tweets_g <- search_tweets("brexit", n=5000, type="mixed", include_rts=TRUE, 
-                          token = token, lang="en",
-                          geocode=paste(sub_p_area_$long,
-                                        sub_p_area_$lat,
-                                        paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
-                                        )
-      all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
-      nrow(all_Tweets)
-      }
-#}
+  
+  #a point 
+  sub_p_area_ <- p_area_[j, ]
+  
+  tweets_g <- search_tweets("brexit", n=5000, type="mixed", include_rts=TRUE, 
+                            token = token, lang="en",
+                            geocode=paste(sub_p_area_$long,
+                                          sub_p_area_$lat,
+                                          paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
+  )
+  if(nrow(tweets_g)!=0){
+    tweets_g <- tweets_g %>% mutate(class=unique_party[i])
+    all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
+    nrow(all_Tweets)
+    flush.console()
+    print(paste(i, j, sep="|"))
+  }
+}
 
 #put system to sleep for 20 minutes after 10 calls (i.e. after data download for each party)
 #this is to prevent violating '15 calls per 15minutes' API download limit.
 
-write_as_csv(all_Tweets, paste("C:/Users/monsu/Documents/GitHub/Sentiment-analysis/",unique_party[i],"download_0106_0107.csv", sep="_"), na="NA", fileEncoding = "UTF-8")
-
-#if(i == 2){
-testit(1200)
-#}
+#put system to sleep for 10 minutes
+testit(600)
 
 }
 
-getwd()
-#download data by Vountry
-#----------------------------------------------------
-#----------------------------------------------------
-#----------------------------------------------------
-#----------------------------------------------------
+try(write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_2020-01-14_byVotingResult.csv", na="NA", fileEncoding = "UTF-8"), silent=TRUE)
 
+
+
+#The code below is for testing 
+#-------------------------------------------------------------------------------
 #to download the tweet of the last 'whatever' days 
 #at this first circle for the conservative
 #no need to add the fromDate toDate as they seem to not doing anything
@@ -158,38 +239,9 @@ max(tweets_g$created_at)  #"2020-01-14 22:02:08 UTC"
 write_as_csv(tweets_g, "download_14012020.csv", na="NA", fileEncoding = "UTF-8")
 
 nrow(all_Tweets)
+getwd()
+#then try tomorrow and see if the minimum will change also...like that..
 #}
 #-------------------------------------------------------------------------------
 
-write_as_csv(tweets_g, "another.csv", na="NA", fileEncoding = "UTF-8")
-
-
-
-
-write.table(all_Tweets, 
-            file=paste("C:/Users/monsu/Documents/GitHub/Sentiment-analysis/","download_", as.character(dates[1]), "_to_", as.character(dates[2]), "_", unique_party[i], ".csv", sep=""), 
-            sep=",", row.names = F)
-
-
-#53.449123, -2.3965435
-
-
-
-tweets_g <- search_tweets("brexit", n=1000, type="mixed", include_rts=TRUE, 
-                          token = token, lang="en",
-                          fromDate="202001111420", toDate="202001141425", 
-                          place="Leeds")
-
-tweets_g
-
-write_as_csv(tweets_g, "another3.csv", na="NA", fileEncoding = "UTF-8")
-
-
-#point_radius:
-# The point_radius: operator allows you to specify a circular geographic area and match Tweets 
-#containing Tweet-specific location data that fall within that area. To use, define a central lon-lat coordinate, 
-#and then set the radius (up to 25 miles). Any Tweet containing a geo Point that falls within this region will be matched. 
-#Addtionally, Tweets containing Twitter Places will match where the 'geo polygon defined for the Place' falls 
-#fully within the defined point-radius area. Places whose polygons fall outside the defined point-radius 
-#area to any extent will not match.
 

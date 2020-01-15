@@ -147,25 +147,18 @@ library(stringr)
 
 # Research objectives
 
-1. To analyse the political sentiments around `Brexit` before and after the 31st Jan. 2020 (`Brexit date`).
-
-2. To examine whether the political sentiments bear any associations with political control (i.e. party) of the geographical regions (using the Dec. 2019 general election results).
+1. To analyse the political sentiments/opinion of UK citizens on `Brexit` before and after the 31st of January 2020 (`Brexit date`).
+ 1.1 To examine the nature of the political sentiments in each  country within UK.
+ 1.2 To examinie the nature of the political sentiments across each constituent areas, based on the last UK general election. 
 
 # Data download strategy
 
-The Twitter API is used to download tweets from different geographical areas across the UK. Figure `r fig$ref("figs1")`, Figure `r fig$ref("figs2")`, Figure `r fig$ref("figs2")` shows the data download strategy, which involves drawing sets of circles over areas that are now controlled by different political parties based on the last general elections (held on the 12th Dec. 2019). This enables us to download tweets that were tweeted in different areas across the country. Owing to the twitter download constraints, we randomly pick 12 circles from each political area each day and download all tweets that include the keywords `#Brexit` or `brexit`. The download covers from `Jan 1, 2020` to `Feb 29, 2020`. Table xx shows the total number tweets downloaded for each political area over the study period.   
+The Twitter API is used to download tweets across the UK. Figure `r fig$ref("figs1")` shows the data download strategy, which involves drawing sets of circles over areas that are now controlled by different political parties based on the last general elections (held on the 12th Dec. 2019). This enables us to download tweets that were tweeted in different areas across the country. Owing to the twitter download constraints, we randomly pick 12 circles from each political area each day and download all tweets that include the keywords `#Brexit` or `brexit`. The download covers from `Jan 1, 2020` to `Feb 29, 2020`. Table xx shows the total number tweets downloaded for each political area over the study period.   
 
-```{r figs1, echo=FALSE, fig.cap=fig$cap("figs1", "UK 2019 General Election Results"), out.width = '60%', fig.align="center"} 
-knitr::include_graphics("UKelectionResult.png")
+```{r figs1, echo=FALSE, fig.cap=fig$cap("figs1", "Data Collection Strategy"), out.width = '100%', fig.align="center"} 
+knitr::include_graphics("DataCollection.png")
 ```
 
-```{r figs2, echo=FALSE, fig.cap=fig$cap("figs1", "Data download (by Country)"), out.width = '60%', fig.align="center"} 
-knitr::include_graphics("DatacollectionbyCountry.png")
-```
-
-```{r figs3, echo=FALSE, fig.cap=fig$cap("figs1", "Data download (by Voting results)"), out.width = '60%', fig.align="center"} 
-knitr::include_graphics("DatacollectionbyVoting.png")
-```
 
 ```{r, echo=FALSE, include=FALSE}
 require(knitr)
