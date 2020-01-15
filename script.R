@@ -7,14 +7,14 @@
 
 #https://www.r-bloggers.com/twitter-data-analysis-in-r/      #very good! equation for sentiment score.
 
-setwd("C:/Users/monsu/Desktop/software paper/")
+#setwd("C:/Users/monsu/Desktop/software paper/")
 
 ## load rtweet
 library(rtweet)
 library(ggplot2)
 library(dplyr)
 library(tidytext)
-library(twitteR)
+#library(twitteR)
 library(ROAuth)
 library(NLP)#, lib.loc="~/R/win-library/3.3")
 library(twitteR)#, lib.loc="~/R/win-library/3.3")
@@ -28,7 +28,6 @@ library(sf)
 library(rgdal)
 
 #setting up twitter
-library(rtweet)
 consumer_key <- 'rJWorDnMoARYE7OUTqaz0rOo4'
 consumer_secret <- 'dUJktwlOwdbaUNB15z2Yw4HI3piOd1aTevADmathrNhBdLC3ny'
 access_token <- '1108852279434715136-4IpdsZ2t69wcj0GZ3ricwL8XsU0RzT'
