@@ -236,7 +236,7 @@ write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-#scottish independence
+#scottish independence download by country
 
 
 #Data download by Country
@@ -252,7 +252,7 @@ p_area <- data.frame(st_as_sf(shp))
 unique_country <- as.character(unique(p_area$Party))
 
 #keywords to search in tweets
-hashtags <- "#brexit OR brexit"
+hashtags <- "#scotref OR scotref OR #indyref OR indyref OR #indyref2 OR indyref2 OR #scottishindependence OR scottishindependence"
 
 #tweets holder
 all_Tweets <- NULL
@@ -319,6 +319,64 @@ write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+london
+51.507351 -0.127758
+manchester 
+53.480709 -2.234380
+
+
+tweets_g <- search_tweets(hashtags, n=17500, type="recent", include_rts=TRUE, 
+                          token = token, lang="en",
+                          geocode=paste(sub_p_area_$long,
+                                        sub_p_area_$lat,
+                                        paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
 
 
 
