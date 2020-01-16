@@ -71,14 +71,14 @@ p_area <- data.frame(st_as_sf(shp))
 unique_country <- as.character(unique(p_area$Party))
 
 #keywords to search in tweets
-hashtags <- 'brexit'
+hashtags <- "#brexit OR brexit"
 
 #loop through each party name
 #collect all points [Lat, Long, & radius] drawn in the area belonging to the party.
 #For each 'party_point', download n=10000 tweets that includes the 'hashtags'  
 
 #initialise (total tweets downloaded)
-total_ <- 0
+
 
 #tweets holder
 all_Tweets <- NULL
@@ -97,8 +97,8 @@ for(i in 1:length(unique_country)){ #i<-1
     
     #a point 
     sub_p_area_ <- p_area_[j, ]
-    
-    tweets_g <- search_tweets("brexit", n=5000, type="mixed", include_rts=TRUE, 
+ 
+    tweets_g <- search_tweets(hashtags, n=17500, type="recent", include_rts=TRUE, 
                               token = token, lang="en",
                               geocode=paste(sub_p_area_$long,
                                             sub_p_area_$lat,
@@ -109,8 +109,11 @@ for(i in 1:length(unique_country)){ #i<-1
     all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
     nrow(all_Tweets)
     flush.console()
-    print(paste(i, j, sep="|"))
+    print(paste("byCountry",i, j, sep="|"))
     }
+    flush.console()
+    print("waiting for 15.5 minutes")
+    testit(960)
   }
   #}
   
@@ -123,11 +126,16 @@ for(i in 1:length(unique_country)){ #i<-1
   
 }
 
-try(write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_2020-01-14_byCountry.csv", na="NA", fileEncoding = "UTF-8"), silent=TRUE)
+
+uniq_Dates <- unique(all_Tweets$created_at)
+uniq_Dates <- uniq_Dates[order(uniq_Dates)]
+
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_TRIAL2.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_uniq_Dates_TRIAL2.csv", sep=",", row.names = F)
 #write_as_csv(tweets_g, "try.csv", na="NA", fileEncoding = "UTF-8")
 # 
 #put system to sleep for 10 minutes
-testit(600)
+
 
 
 #Data download by Voting result
@@ -148,7 +156,7 @@ unique_party <- c(unique_party[2], unique_party[1], unique_party[3], unique_part
 #dates <- seq.Date(from = as.Date('2020-01-12 00:00:00'), to = as.Date('2020-01-13 00:00:00'), by = 'days') 
 
 #keywords to search in tweets
-hashtags <- 'brexit'
+hashtags <- "#brexit OR brexit"
 
 #loop through each party name
 #collect all points [Lat, Long, & radius] drawn in the area belonging to the party.
@@ -191,7 +199,7 @@ for(j in 1:nrow(p_area_)){  #j<-1
   #a point 
   sub_p_area_ <- p_area_[j, ]
   
-  tweets_g <- search_tweets("brexit", n=5000, type="mixed", include_rts=TRUE, 
+  tweets_g <- search_tweets(hashtags, n=5000, type="recent", include_rts=TRUE, 
                             token = token, lang="en",
                             geocode=paste(sub_p_area_$long,
                                           sub_p_area_$lat,
@@ -202,19 +210,122 @@ for(j in 1:nrow(p_area_)){  #j<-1
     all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
     nrow(all_Tweets)
     flush.console()
-    print(paste(i, j, sep="|"))
+    print(paste("byVoting",i, j, sep="|"))
   }
+  flush.console()
+  print("waiting for 5 minutes")
+  testit(300)
 }
 
 #put system to sleep for 20 minutes after 10 calls (i.e. after data download for each party)
 #this is to prevent violating '15 calls per 15minutes' API download limit.
 
 #put system to sleep for 10 minutes
-testit(600)
+}
+
+uniq_Dates <- unique(all_Tweets$created_at)
+uniq_Dates <- uniq_Dates[order(uniq_Dates)]
+
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_TRIAL2.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_uniq_Dates_TRIAL2.csv", sep=",", row.names = F)
+#w
+
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+#scottish independence
+
+
+#Data download by Country
+#----------------------------------------------------
+#----------------------------------------------------
+#----------------------------------------------------
+#----------------------------------------------------
+#import shapefiles
+shp <- readOGR(dsn=".", "CirclesByCountry")  #head
+p_area <- data.frame(st_as_sf(shp))
+
+#unique party names
+unique_country <- as.character(unique(p_area$Party))
+
+#keywords to search in tweets
+hashtags <- "#brexit OR brexit"
+
+#tweets holder
+all_Tweets <- NULL
+
+#Given a party  
+for(i in 1:length(unique_country)){ #i<-1
+  
+  # download data from all areas of each... 
+  p_area_ <- 
+    p_area %>% 
+    dplyr::filter(Party==unique_country[i])
+  
+  #----------------  
+  #loop through the selected five points   
+  for(j in 1:nrow(p_area_)){  #j<-1
+    
+    #a point 
+    sub_p_area_ <- p_area_[j, ]
+    
+    tweets_g <- search_tweets(hashtags, n=17500, type="recent", include_rts=TRUE, 
+                              token = token, lang="en",
+                              geocode=paste(sub_p_area_$long,
+                                            sub_p_area_$lat,
+                                            paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
+    )
+    if(nrow(tweets_g)!=0){
+      tweets_g <- tweets_g %>% mutate(class=unique_country[i])
+      all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
+      nrow(all_Tweets)
+      flush.console()
+      print(paste("byCountry",i, j, sep="|"))
+    }
+    flush.console()
+    print("waiting for 15.5 minutes")
+    testit(960)
+  }
 
 }
 
-try(write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_2020-01-14_byVotingResult.csv", na="NA", fileEncoding = "UTF-8"), silent=TRUE)
+
+uniq_Dates <- unique(all_Tweets$created_at)
+uniq_Dates <- uniq_Dates[order(uniq_Dates)]
+
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_TRIAL2.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_uniq_Dates_TRIAL2.csv", sep=",", row.names = F)
+#write_as_csv(tweets_g, "try.csv", na="NA", fileEncoding = "UTF-8")
+# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -243,4 +354,25 @@ getwd()
 #}
 #-------------------------------------------------------------------------------
 
+
+
+
+
+
+#to download Reka's twees
+
+tweets_g <- search_tweets("brexit", n=10000, type="recent", include_rts=TRUE, 
+                          token = token, lang="en",
+                          geocode="51.52823432,-0.16123412344,100mi")
+
+(geocode="53.45321345,-2.8651231233,100mi") #Manchester
+(geocode="51.52823432,-0.16123412344,100mi") #London
+
+tweets_g  #all_Tweets<-NULL 121x90
+min(tweets_g$created_at)  #"2020-01-06 21:53:39 UTC"
+max(tweets_g$created_at)  #"2020-01-14 22:02:08 UTC"
+write_as_csv(tweets_g, "dsfdsdss.csv", na="NA", fileEncoding = "UTF-8")
+
+nrow(all_Tweets)
+getwd()
 
