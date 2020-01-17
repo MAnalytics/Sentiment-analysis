@@ -1,8 +1,12 @@
+
+#where to buy UK basemap: https://www.canstockphoto.com/uk-countries-map-and-flags-45885601.html
+
 #Assessing the inequality in the political sentiment - A case of #Indiref2
 #Indiref2 - Examining how political sentiments vary across the United Kingdom
 
 library(rtweet)
 library(syuzhet)
+
 
 #https://towardsdatascience.com/a-guide-to-mining-and-analysing-tweets-with-r-2f56818fdd16
 #2. SHOW THE RATIO OF REPLIES/RETWEETS/ORGANIC TWEETS
@@ -14,12 +18,21 @@ round_df <- function(x, digits) {
   x
 }
 
-# Creating a data frame
-data <- data.frame(
-  category=c("Organic", "Retweets", "Replies"),
-  count=c(2856, 192, 120)
-)
-data
+data1 = read.table(file="F:/IndirefTweets/TRIAL 2 20200116_Scot/scottishIndy_byCountry_TRIAL2.csv", sep=",", head=TRUE)
+View(data2)
+
+data2 = read.table(file="F:/IndirefTweets/TRIAL 3 20200117_Scot/scottishIndy_byCountry_TRIAL3.csv", sep=",", head=TRUE)
+View(data2)
+
+#which is the unique id
+#check whether we can merge both... 
+
+# # Creating a data frame
+# data <- data.frame(
+#   category=c("Organic", "Retweets", "Replies"),
+#   count=c(2856, 192, 120)
+# )
+# data
 
 # Adding columns 
 data$fraction = data$count / sum(data$count)
