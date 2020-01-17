@@ -6,7 +6,7 @@
 
 library(rtweet)
 library(syuzhet)
-
+library(dplyr)
 
 #https://towardsdatascience.com/a-guide-to-mining-and-analysing-tweets-with-r-2f56818fdd16
 #2. SHOW THE RATIO OF REPLIES/RETWEETS/ORGANIC TWEETS
@@ -21,8 +21,27 @@ round_df <- function(x, digits) {
 data1 = read.table(file="F:/IndirefTweets/TRIAL 2 20200116_Scot/scottishIndy_byCountry_TRIAL2.csv", sep=",", head=TRUE)
 View(data1)
 
+
+nrow(data1 %>% 
+  dplyr::filter(is_retweet==FALSE) %>%
+  dplyr::filter(is.na(reply_to_status_id)))
+
+positive and negative tweets
+
+
+head(data1)
+
 data2 = read.table(file="F:/IndirefTweets/TRIAL 3 20200117_Scot/scottishIndy_byCountry_TRIAL3.csv", sep=",", head=TRUE)
 View(data2)
+
+
+
+#important fields
+#organic (to get the original.)
+#is_retweet (to filter retweet)
+#reply_to_status_id (to filter replies)
+
+
 
 #which column in the unique field
 summary(data1)
@@ -30,7 +49,7 @@ nrow(data1)
 length(unique(data1$user_id))
 length(unique(data1$status_id))
 
-length(which(!unique(data1$status_id) %in% unique(data2$status_id)))
+length(data1[which(!unique(data1$status_id) %in% unique(data2$status_id)),]   )
 
 length(which(unique(data1$status_id) %in% unique(data2$status_id)))
 
