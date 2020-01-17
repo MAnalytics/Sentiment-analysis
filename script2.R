@@ -1,5 +1,5 @@
-install.packages("remotes")
-remotes::install_github("mdozmorov/MDmisc")
+install.packages("forestmangr")
+library(forestmangr)
 
 # Creating a data frame
 data <- data.frame(
@@ -25,6 +25,17 @@ ggplot(data, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Type_of_Tweet)) +
   theme_void() +
   theme(legend.position = "right")
 
+
+round_df <- function(x=data, digits=2) {
+  
+  numeric_columns <- sapply(x, class) == "numeric"
+  
+  x[numeric_columns] <-  round(x[numeric_columns], digits)
+  x
+}
+
+## check classes
+sapply(x, class)
 
 
 
