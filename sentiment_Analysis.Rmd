@@ -22,6 +22,8 @@ always_allow_html: yes
 #fig_caption: yes
 ##bibliography: references.bib
 
+self_contained: no
+
 abstract: The xxx
   
 vignette: >
@@ -125,25 +127,6 @@ fig <- local({
 
 Twitter provides us with vast amounts of user-generated language data - a dream for anyone wanting to conduct textual analysis. More than that, tweets allow us to gain insights into the online public behaviour. As such, analysing Twitter has become a crucial source of information for brands and agencies.
 Several factors have given Twitter considerable advantages over other social media platforms for analysis. First, the limited character size of tweets provides us with a relatively homogeneous corpora. Second, the millions of tweets published everyday allows access to large data samples. Third, the tweets are publicly available and easily accessible as well as retrievable via APIs
-
-
-```{r, echo=FALSE, include=FALSE}
-library(rtweet)
-library(ggplot2)
-library(dplyr)
-library(tidytext)
-library(twitteR)
-library(ROAuth)
-library(NLP)
-library(twitteR)
-library(syuzhet)
-library(tm)
-library(SnowballC)
-library(stringi)
-library(topicmodels)
-library(lubridate)
-library(stringr)
-```
 
 # Research objectives
 
@@ -321,6 +304,6 @@ https://www.tidytextmining.com/sentiment.html
 All three of these lexicons are based on unigrams, i.e., single words. These lexicons contain many English words and the words are assigned scores for positive/negative sentiment, and also possibly emotions like joy, anger, sadness, and so forth. The nrc lexicon categorizes words in a binary fashion ("yes"/"no") into categories of positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, and trust. The bing lexicon categorizes words in a binary fashion into positive and negative categories. The AFINN lexicon assigns words with a score that runs between -5 and 5, with negative scores indicating negative sentiment and positive scores indicating positive sentiment. All of this information is tabulated in the sentiments dataset, and tidytext provides a function get_sentiments() to get specific sentiment lexicons without the columns that are not used in that lexicon.
 
 Getting sentiment score for each tweet
-We will first try to get the emotion score for each of the tweets. ‘Syuzhet’ breaks the emotion into 10 different emotions – anger, anticipation, disgust, fear, joy, sadness, surprise, trust, negative and positive.
+We will first try to get the emotion score for each of the tweets. ?Syuzhet? breaks the emotion into 10 different emotions ? anger, anticipation, disgust, fear, joy, sadness, surprise, trust, negative and positive.
 
 
