@@ -30,15 +30,15 @@ nrow(data1)
 length(unique(data1$user_id))
 length(unique(data1$status_id))
 
-length(which(unique(data1$status_id) %in% unique(data2$status_id)))
+length(which(!unique(data1$status_id) %in% unique(data2$status_id)))
 
 length(which(unique(data1$status_id) %in% unique(data2$status_id)))
 
-View(data1[which(data1$user_id=="x89564365"),])
+View(data1[which(data1$user_id=="x17895820"),])
 
 write.table(g$text, file="text.txt")
 
-View(data2[which(data2$user_id=="x89564365"),])
+View(data2[which(data2$user_id=="x17895820"),])
 
 getwd()
 
