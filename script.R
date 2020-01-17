@@ -58,6 +58,7 @@ testit <- function(x){
 }
 
 
+
 #Data download by Country
 #----------------------------------------------------
 #----------------------------------------------------
@@ -130,8 +131,8 @@ for(i in 1:length(unique_country)){ #i<-1
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_TRIAL2.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_uniq_Dates_TRIAL2.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_TRIAL4.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_uniq_Dates_TRIAL4.csv", sep=",", row.names = F)
 #write_as_csv(tweets_g, "try.csv", na="NA", fileEncoding = "UTF-8")
 # 
 #put system to sleep for 10 minutes
@@ -226,8 +227,8 @@ for(j in 1:nrow(p_area_)){  #j<-1
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_TRIAL2.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_uniq_Dates_TRIAL2.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_TRIAL4.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_uniq_Dates_TRIAL4.csv", sep=",", row.names = F)
 #w
 
 
@@ -296,8 +297,8 @@ for(i in 1:length(unique_country)){ #i<-1
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_TRIAL2.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_uniq_Dates_TRIAL2.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_TRIAL4.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_uniq_Dates_TRIAL4.csv", sep=",", row.names = F)
 #write_as_csv(tweets_g, "try.csv", na="NA", fileEncoding = "UTF-8")
 # 
 
@@ -371,21 +372,21 @@ london
 manchester 
 53.480709 -2.234380
 
+hashtags="#newwstff"
 
-tweets_g <- search_tweets(hashtags, n=17500, type="recent", include_rts=TRUE, 
+tweets_g <- search_tweets(hashtags, n=50, type="recent", include_rts=TRUE, 
                           token = token, lang="en",
-                          geocode=paste(sub_p_area_$long,
-                                        sub_p_area_$lat,
-                                        paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
+                          geocode='53.480709,-2.234380,30mi')
 
 
+tweets_g
+write_as_csv(tweets_g, "asssssssss.csv", na="NA", fileEncoding = "UTF-8")
 
+tweets_g$screen_name == ""
 
+tweets_g$screen_name == ""
 
-
-
-
-
+getwd()
 
 #The code below is for testing 
 #-------------------------------------------------------------------------------
