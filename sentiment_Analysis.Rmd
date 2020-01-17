@@ -126,25 +126,6 @@ fig <- local({
 Twitter provides us with vast amounts of user-generated language data - a dream for anyone wanting to conduct textual analysis. More than that, tweets allow us to gain insights into the online public behaviour. As such, analysing Twitter has become a crucial source of information for brands and agencies.
 Several factors have given Twitter considerable advantages over other social media platforms for analysis. First, the limited character size of tweets provides us with a relatively homogeneous corpora. Second, the millions of tweets published everyday allows access to large data samples. Third, the tweets are publicly available and easily accessible as well as retrievable via APIs
 
-
-```{r, echo=FALSE, include=FALSE}
-library(rtweet)
-library(ggplot2)
-library(dplyr)
-library(tidytext)
-library(twitteR)
-library(ROAuth)
-library(NLP)
-library(twitteR)
-library(syuzhet)
-library(tm)
-library(SnowballC)
-library(stringi)
-library(topicmodels)
-library(lubridate)
-library(stringr)
-```
-
 # Research objectives
 
 1. To analyse the political sentiments/opinion of UK citizens on `Brexit` before and after the 31st of January 2020 (`Brexit date`).
