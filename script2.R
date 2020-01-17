@@ -5,7 +5,7 @@ library(rtweet)
 library(syuzhet)
 
 #https://towardsdatascience.com/a-guide-to-mining-and-analysing-tweets-with-r-2f56818fdd16
-2. SHOW THE RATIO OF REPLIES/RETWEETS/ORGANIC TWEETS
+#2. SHOW THE RATIO OF REPLIES/RETWEETS/ORGANIC TWEETS
 
 #function for rounding off values in a dataframe
 round_df <- function(x, digits) {
@@ -40,7 +40,7 @@ ggplot(data, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Type_of_Tweet)) +
   theme(legend.position = "right")
 
 
-2. SHOW THE RATIO OF REPLIES/RETWEETS/ORGANIC TWEETS
+#2. SHOW THE RATIO OF REPLIES/RETWEETS/ORGANIC TWEETS
 #insight into participation.Conversation# engage in conversation 
 
 # Keeping only the retweets
@@ -54,7 +54,7 @@ data <- data.frame(
   count=c(2856, 192, 120)
 )
 
-5. SHOW THE MOST FREQUENT WORDS FOUND IN THE TWEETS
+#5. SHOW THE MOST FREQUENT WORDS FOUND IN THE TWEETS
 #Data cleaning 1: remove punctuations
 Gates_tweets_organic$text <-  gsub("https\\S*", "", Gates_tweets_organic$text)
 Gates_tweets_organic$text <-  gsub("@\\S*", "", Gates_tweets_organic$text) 
@@ -68,3 +68,50 @@ tweets <- Gates_tweets_organic %>%
   unnest_tokens(word, text)
 tweets <- tweets %>%
   anti_join(stop_words)
+
+#Go to script 1 for pulling all together..
+tweets %>% # gives you a bar chart of the most frequent words found in the tweets
+  count(word, sort = TRUE) %>%
+  top_n(15) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() +
+  labs(y = "Count",
+       x = "Unique words",
+       title = "Most frequent words found in the tweets of Bill Gates",
+       subtitle = "Stop words removed from the list")
+
+6. SHOW THE MOST FREQUENTLY USED HASHTAGS 
+Gates_tweets_organic$hashtags <- as.character(Gates_tweets_organic$hashtags)
+Gates_tweets_organic$hashtags <- gsub("c\\(", "", Gates_tweets_organic$hashtags)
+set.seed(1234)
+wordcloud(Gates_tweets_organic$hashtags, min.freq=5, scale=c(3.5, .5), random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))#rendered as hashtags
+
+#account where most tweet originates
+set.seed(1234)
+wordcloud(Gates_retweets$retweet_screen_name, min.freq=3, scale=c(2, .5), random.order=FALSE, rot.per=0.25, 
+          colors=brewer.pal(8, "Dark2"))
+
+#8. PERFORM A SENTIMENT ANALYSIS OF THE TWEETS
+
+library(syuzhet)
+# Converting tweets to ASCII to trackle strange characters
+tweets <- iconv(tweets, from="UTF-8", to="ASCII", sub="")
+# removing retweets, in case needed 
+tweets <-gsub("(RT|via)((?:\\b\\w*@\\w+)+)","",tweets)
+# removing mentions, in case needed
+tweets <-gsub("@\\w+","",tweets)
+ew_sentiment<-get_nrc_sentiment((tweets))
+sentimentscores<-data.frame(colSums(ew_sentiment[,]))
+names(sentimentscores) <- "Score"
+sentimentscores <- cbind("sentiment"=rownames(sentimentscores),sentimentscores)
+rownames(sentimentscores) <- NULL
+ggplot(data=sentimentscores,aes(x=sentiment,y=Score))+
+  geom_bar(aes(fill=sentiment),stat = "identity")+
+  theme(legend.position="none")+
+  xlab("Sentiments")+ylab("Scores")+
+  ggtitle("Total sentiment based on scores")+
+  theme_minimal()
