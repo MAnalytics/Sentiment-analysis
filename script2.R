@@ -19,7 +19,7 @@ round_df <- function(x, digits) {
 }
 
 data1 = read.table(file="F:/IndirefTweets/TRIAL 2 20200116_Scot/scottishIndy_byCountry_TRIAL2.csv", sep=",", head=TRUE)
-View(data2)
+View(data1)
 
 data2 = read.table(file="F:/IndirefTweets/TRIAL 3 20200117_Scot/scottishIndy_byCountry_TRIAL3.csv", sep=",", head=TRUE)
 View(data2)
