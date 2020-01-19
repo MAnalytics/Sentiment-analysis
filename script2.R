@@ -18,21 +18,42 @@ round_df <- function(x, digits) {
   x
 }
 
-data1 = read.table(file="F:/IndirefTweets/TRIAL 2 20200116_Scot/scottishIndy_byCountry_TRIAL2.csv", sep=",", head=TRUE)
-View(data1)
+setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef/")
 
+data1 = read.table(file="./scottishIndy_byCountry_1.csv", sep=",", head=TRUE)
+data2 = read.table(file="./scottishIndy_byCountry_2.csv", sep=",", head=TRUE)
+data3 = read.table(file="./scottishIndy_byCountry_3.csv", sep=",", head=TRUE)
 
-nrow(data1 %>% 
+#combine tweets
+tweets <- rbind(data1, data2, data3)
+
+nrow(tweets)
+
+tweets_ <- tweets %>% 
+  group_by(user_id, created_at) %>%
   dplyr::filter(is_retweet==FALSE) %>%
-  dplyr::filter(is.na(reply_to_status_id)))
+  dplyr::filter(is.na(reply_to_status_id)) #%>%
+ # arrange(user_id, created_at) %>%
 
-positive and negative tweets
+  
+  
+
+nrow(tweets_)
+head(tweets_)
+
+tweets_ %>% head()
+
+View(tweets_)
+
+
+
+
+
+
 
 
 head(data1)
 
-data2 = read.table(file="F:/IndirefTweets/TRIAL 3 20200117_Scot/scottishIndy_byCountry_TRIAL3.csv", sep=",", head=TRUE)
-View(data2)
 
 
 

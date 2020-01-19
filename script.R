@@ -61,6 +61,16 @@ testit <- function(x){
 
 
 
+
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+#scottish independence download by country
+
+
 #Data download by Country
 #----------------------------------------------------
 #----------------------------------------------------
@@ -74,21 +84,14 @@ p_area <- data.frame(st_as_sf(shp))
 unique_country <- as.character(unique(p_area$Party))
 
 #keywords to search in tweets
-hashtags <- "#brexit OR brexit"
-
-#loop through each party name
-#collect all points [Lat, Long, & radius] drawn in the area belonging to the party.
-#For each 'party_point', download n=10000 tweets that includes the 'hashtags'  
-
-#initialise (total tweets downloaded)
-
+hashtags <- "#scotref OR scotref OR #indyref OR indyref OR #indyref2 OR indyref2 OR #scottishindependence OR scottishindependence"
 
 #tweets holder
 all_Tweets <- NULL
 
 #Given a party  
 for(i in 1:length(unique_country)){ #i<-1
-
+  
   # download data from all areas of each... 
   p_area_ <- 
     p_area %>% 
@@ -100,7 +103,7 @@ for(i in 1:length(unique_country)){ #i<-1
     
     #a point 
     sub_p_area_ <- p_area_[j, ]
- 
+    
     tweets_g <- search_tweets(hashtags, n=17500, type="recent", include_rts=TRUE, 
                               token = token, lang="en",
                               geocode=paste(sub_p_area_$long,
@@ -108,36 +111,31 @@ for(i in 1:length(unique_country)){ #i<-1
                                             paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
     )
     if(nrow(tweets_g)!=0){
-    tweets_g <- tweets_g %>% mutate(class=unique_country[i])
-    all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
-    nrow(all_Tweets)
-    flush.console()
-    print(paste("byCountry",i, j, sep="|"))
+      tweets_g <- tweets_g %>% mutate(class=unique_country[i])
+      all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
+      nrow(all_Tweets)
+      flush.console()
+      print(paste("byCountry",i, j, sep="|"))
     }
     flush.console()
     print("waiting for 15.5 minutes")
     testit(960)
   }
-  #}
-  
-  #put system to sleep for 20 minutes after 10 calls (i.e. after data download for each party)
-  #this is to prevent violating '15 calls per 15minutes' API download limit.
-  
-  #if(i == 2){
-  #testit(1200)
-  #}
   
 }
 
 
-uniq_Dates <- unique(all_Tweets$created_at)
-uniq_Dates <- uniq_Dates[order(uniq_Dates)]
+##uniq_Dates <- unique(all_Tweets$created_at)
+##uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_TRIAL4.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_uniq_Dates_TRIAL4.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_TRIAL7.csv", na="NA", fileEncoding = "UTF-8")
+
+
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_uniq_Dates_TRIAL7.csv", sep=",", row.names = F)
 #write_as_csv(tweets_g, "try.csv", na="NA", fileEncoding = "UTF-8")
 # 
-#put system to sleep for 10 minutes
+
+head(all_Tweets)
 
 
 
@@ -229,17 +227,10 @@ for(j in 1:nrow(p_area_)){  #j<-1
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_TRIAL4.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_uniq_Dates_TRIAL4.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_TRIAL7.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_uniq_Dates_TRIAL7.csv", sep=",", row.names = F)
 #w
 
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-#scottish independence download by country
 
 
 #Data download by Country
@@ -255,7 +246,14 @@ p_area <- data.frame(st_as_sf(shp))
 unique_country <- as.character(unique(p_area$Party))
 
 #keywords to search in tweets
-hashtags <- "#scotref OR scotref OR #indyref OR indyref OR #indyref2 OR indyref2 OR #scottishindependence OR scottishindependence"
+hashtags <- "#brexit OR brexit"
+
+#loop through each party name
+#collect all points [Lat, Long, & radius] drawn in the area belonging to the party.
+#For each 'party_point', download n=10000 tweets that includes the 'hashtags'  
+
+#initialise (total tweets downloaded)
+
 
 #tweets holder
 all_Tweets <- NULL
@@ -292,23 +290,27 @@ for(i in 1:length(unique_country)){ #i<-1
     print("waiting for 15.5 minutes")
     testit(960)
   }
-
+  #}
+  
+  #put system to sleep for 20 minutes after 10 calls (i.e. after data download for each party)
+  #this is to prevent violating '15 calls per 15minutes' API download limit.
+  
+  #if(i == 2){
+  #testit(1200)
+  #}
+  
 }
 
 
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_TRIAL4.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_uniq_Dates_TRIAL4.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_TRIAL7.csv", na="NA", fileEncoding = "UTF-8")
+
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_uniq_Dates_TRIAL7.csv", sep=",", row.names = F)
 #write_as_csv(tweets_g, "try.csv", na="NA", fileEncoding = "UTF-8")
 # 
-
-
-
-
-
-
+#put system to sleep for 10 minutes
 
 
 
