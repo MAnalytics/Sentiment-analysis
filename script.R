@@ -8,7 +8,7 @@
 #https://www.r-bloggers.com/twitter-data-analysis-in-r/      #very good! equation for sentiment score.
 
 #setwd("C:/Users/monsu/Desktop/software paper/")
-#setwd("C:/Users/monsu/Desktop/software paper/")
+setwd("C:/Users/monsu/Desktop/software paper/")
 getwd()
 
 ## load rtweet
@@ -16,7 +16,7 @@ library(rtweet)
 library(ggplot2)
 library(dplyr)
 library(tidytext)
-#library(twitteR)
+library(twitteR)
 library(ROAuth)
 library(NLP)#, lib.loc="~/R/win-library/3.3")
 library(twitteR)#, lib.loc="~/R/win-library/3.3")
@@ -111,7 +111,7 @@ for(i in 1:length(unique_country)){ #i<-1
                                             paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
     )
     if(nrow(tweets_g)!=0){
-      tweets_g <- tweets_g %>% mutate(class=unique_country[i])
+      tweets_g <- tweets_g %>% dplyr::mutate(class=unique_country[i])
       all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
       nrow(all_Tweets)
       flush.console()
@@ -128,10 +128,10 @@ for(i in 1:length(unique_country)){ #i<-1
 ##uniq_Dates <- unique(all_Tweets$created_at)
 ##uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_TRIAL7.csv", na="NA", fileEncoding = "UTF-8")
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_TRIAL9.csv", na="NA", fileEncoding = "UTF-8")
 
 
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_uniq_Dates_TRIAL7.csv", sep=",", row.names = F)
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_uniq_Dates_TRIAL9.csv", sep=",", row.names = F)
 #write_as_csv(tweets_g, "try.csv", na="NA", fileEncoding = "UTF-8")
 # 
 
@@ -207,7 +207,7 @@ for(j in 1:nrow(p_area_)){  #j<-1
                                           paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
   )
   if(nrow(tweets_g)!=0){
-    tweets_g <- tweets_g %>% mutate(class=unique_party[i])
+    tweets_g <- tweets_g %>% dplyr::mutate(class=unique_party[i])
     all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
     nrow(all_Tweets)
     flush.console()
@@ -227,8 +227,8 @@ for(j in 1:nrow(p_area_)){  #j<-1
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_TRIAL7.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_uniq_Dates_TRIAL7.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_TRIAL9.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_uniq_Dates_TRIAL9.csv", sep=",", row.names = F)
 #w
 
 
@@ -280,7 +280,7 @@ for(i in 1:length(unique_country)){ #i<-1
                                             paste(sub_p_area_$st_lengths,"mi", sep=""), sep=",")
     )
     if(nrow(tweets_g)!=0){
-      tweets_g <- tweets_g %>% mutate(class=unique_country[i])
+      tweets_g <- tweets_g %>% dplyr::mutate(class=unique_country[i])
       all_Tweets <- rbind(all_Tweets, tweets_g)  #all_Tweets<-NULL
       nrow(all_Tweets)
       flush.console()
@@ -305,9 +305,9 @@ for(i in 1:length(unique_country)){ #i<-1
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_TRIAL7.csv", na="NA", fileEncoding = "UTF-8")
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_TRIAL9.csv", na="NA", fileEncoding = "UTF-8")
 
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_uniq_Dates_TRIAL7.csv", sep=",", row.names = F)
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_uniq_Dates_TRIAL9.csv", sep=",", row.names = F)
 #write_as_csv(tweets_g, "try.csv", na="NA", fileEncoding = "UTF-8")
 # 
 #put system to sleep for 10 minutes

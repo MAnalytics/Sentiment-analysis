@@ -7,6 +7,11 @@
 library(rtweet)
 library(syuzhet)
 library(dplyr)
+library(plyr) 
+library(textclean)
+library(stringr)
+library(tidytext)
+
 
 #https://towardsdatascience.com/a-guide-to-mining-and-analysing-tweets-with-r-2f56818fdd16
 #2. SHOW THE RATIO OF REPLIES/RETWEETS/ORGANIC TWEETS
@@ -28,14 +33,17 @@ data3 = read.table(file="./scottishIndy_byCountry_3.csv", sep=",", head=TRUE)
 tweets <- rbind(data1, data2, data3)
 
 nrow(tweets)
+head(tweets)
 
 tweets_ <- tweets %>% 
+  select(user_id, status_id, created_at, text, is_retweet, reply_to_status_id) %>%
   group_by(user_id, created_at) %>%
   dplyr::filter(is_retweet==FALSE) %>%
-  dplyr::filter(is.na(reply_to_status_id)) #%>%
- # arrange(user_id, created_at) %>%
+  dplyr::filter(is.na(reply_to_status_id)) %>%
+  arrange(user_id, created_at) %>%
+  mutate(day=subtr(created_at, 1, 10))
 
-  
+head(tweets_)  
   
 
 nrow(tweets_)
