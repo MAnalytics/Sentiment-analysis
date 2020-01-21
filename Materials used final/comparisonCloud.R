@@ -9,10 +9,27 @@
 # uber = paste(UberTweetsCleaned, collapse=" ")
 
 #new
-eng = paste(englandTwt, collapse=" ") 
-wal = paste(walesTwt, collapse=" ")
-nir = paste(NITwt, collapse=" ")
-sco = paste(scotlandTwt, collapse=" ")
+
+#create the data..
+eng <- englandTwt %>%
+  unnest_tokens(word, text) 
+wal <- walesTwt %>%
+  unnest_tokens(word, text) 
+nir <- NITwt %>%
+  unnest_tokens(word, text) 
+sco <- scotlandTwt %>%
+  unnest_tokens(word, text) 
+
+eng = paste(eng, collapse=" ") 
+wal = paste(wal, collapse=" ") 
+nir = paste(nir, collapse=" ") 
+sco = paste(sco, collapse=" ") 
+
+
+# eng = paste(englandTwt, collapse=" ") 
+# wal = paste(walesTwt, collapse=" ")
+# nir = paste(NITwt, collapse=" ")
+# sco = paste(scotlandTwt, collapse=" ")
 
 
 #wordcloud(c(letters, LETTERS, 0:9), seq(1, 1000, len = 62)) #library(tm)
@@ -29,30 +46,25 @@ sco <- str_replace_all(sco, "[[:punct:]]", " ")
 #remove
 eng = str_remove_all(eng, "[\n]")
 eng = str_remove_all(eng, "[\"]")
-
 wal = str_remove_all(wal, "[\n]")
 wal = str_remove_all(wal, "[\"]")
-
 nir = str_remove_all(nir, "[\n]")
 nir = str_remove_all(nir, "[\"]")
-
 sco = str_remove_all(sco, "[\n]")
 sco = str_remove_all(sco, "[\"]")
 
-#> [1] "n ppl"    "tw prs"   "thr bnns"
-
-# removeSpecialChars <- function(x) gsub("[^a-zA-Z0-9 ]", " ", x)
-# # remove special characters
-# 
-# englandTwt$text <- sapply(englandTwt$text, removeSpecialChars)
-# walesTwt$text <- sapply(walesTwt$text, removeSpecialChars)
-# NITwt$text <- sapply(NITwt$text, removeSpecialChars)
-# scotlandTwt$text <- sapply(scotlandTwt$text, removeSpecialChars)
-
-
+#remove all 'within' number & #remove all characters starting with numbers
+eng = tmp <- gsub("\\d+", "", eng)
+eng = gsub("? [[:digit:]]*", " ", eng)
+wal = tmp <- gsub("\\d+", "", wal)
+wal = gsub("? [[:digit:]]*", " ", wal)
+nir = tmp <- gsub("\\d+", "", nir)
+nir = gsub("? [[:digit:]]*", " ", nir)
+sco = tmp <- gsub("\\d+", "", sco)
+sco = gsub("? [[:digit:]]*", " ", sco)
 
 
-
+#all = removeWords(eng,stopwords("english"))
 
 #change the order
 all = c(sco, nir, wal, eng)
@@ -60,7 +72,7 @@ all = c(sco, nir, wal, eng)
 # remove stop-words
 all = removeWords(all,stopwords("english"))
 
-head(all)
+#head(all)
 
 # create corpus
 corpus = Corpus(VectorSource(all))
@@ -69,39 +81,101 @@ corpus = Corpus(VectorSource(all))
 tdm = TermDocumentMatrix(corpus)
 
 # convert as matrix
-tdm = as.matrix(tdm)
-
+tdm = as.matrix(tdm)   #tdm[500:2030,]
 head(tdm)
-# add column names
-##colnames(tdm) = c("MeruCabs", "OlaCabs", "TaxiForSure", "UberIndia")
 
-colnames(tdm) = c("Scotland", "N.Ireland", "Wales", "England")
+cloud_tdm1 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,1])) 
+row.names(cloud_tdm1) <- as.vector(row.names(tdm))
+cloud_tdm2 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,2])) 
+row.names(cloud_tdm2) <- as.vector(row.names(tdm))
+cloud_tdm3 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,3])) 
+row.names(cloud_tdm3) <- as.vector(row.names(tdm))
+cloud_tdm4 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,4])) 
+row.names(cloud_tdm4) <- as.vector(row.names(tdm))
 
-install.packages("devtools")
-install.packages("wordcloud2")
-require(devtools)
-devtools::install_github("lchiffon/wordcloud2")
-library(wordcloud2)
-#-----------------------------
-#individual wordcloud
-#------------------------------------------------------------------------------
+
+write.table(cloud_tdm1, file="cloud1.csv", sep=",", row.names = F)
+write.table(cloud_tdm2, file="cloud2.csv", sep=",", row.names = F)
+write.table(cloud_tdm3, file="cloud3.csv", sep=",", row.names = F)
+write.table(cloud_tdm4, file="cloud4.csv", sep=",", row.names = F)
+
+cloud_tdm1 <- read.table(file="cloud1.csv", sep=",", head = TRUE)
+cloud_tdm1 <- cloud_tdm1[which(cloud_tdm1$word!="indyref"),]  #remove indiref
+cloud_tdm1 <- cloud_tdm1[order(-cloud_tdm1$freq1),]
+cloud_tdm1 <- cloud_tdm1[1:500,]
+
+cloud_tdm2 <- read.table(file="cloud2.csv", sep=",", head = TRUE)
+cloud_tdm2 <- cloud_tdm2[which(cloud_tdm2$word!="indyref"),]  #remove indiref
+cloud_tdm2 <- cloud_tdm2[order(-cloud_tdm2$freq1),]
+cloud_tdm2 <- cloud_tdm2[1:500,]
+
+
+cloud_tdm3 <- read.table(file="cloud3.csv", sep=",", head = TRUE)
+cloud_tdm3 <- cloud_tdm3[which(cloud_tdm3$word!="indyref"),]  #remove indiref
+cloud_tdm3 <- cloud_tdm3[order(-cloud_tdm3$freq1),]
+cloud_tdm3 <- cloud_tdm3[1:500,]
+
+
+cloud_tdm4 <- read.table(file="cloud4.csv", sep=",", head = TRUE)
+cloud_tdm4 <- cloud_tdm4[which(cloud_tdm4$word!="indyref"),]  #remove indiref
+cloud_tdm4 <- cloud_tdm4[order(-cloud_tdm4$freq1),]
+cloud_tdm4 <- cloud_tdm4[1:500,]
+
+# install.packages("devtools")
+# install.packages("wordcloud2")
+# require(devtools)
+# devtools::install_github("lchiffon/wordcloud2")
+# library(wordcloud2)
+
+wordcloud2(data.frame(cloud_tdm1), backgroundColor = "white")
+wordcloud2(data.frame(cloud_tdm2), backgroundColor = "white")
+wordcloud2(data.frame(cloud_tdm3), backgroundColor = "white")
+wordcloud2(data.frame(cloud_tdm4), backgroundColor = "white")
+
+
 
 head(cloud_tdm)
 
 
-cloud_tdm <- data.frame(cbind(word=row.names(tdm), freq=tdm[,1]))  #dim(scot_tdm)
-colnames(cloud_tdm) <- c("word", "freq")
 
-wordcloud2(cloud_tdm, backgroundColor = "grey")
+##colnames(tdm) = c("MeruCabs", "OlaCabs", "TaxiForSure", "UberIndia")
 
-
+colnames(tdm) = c("Scotland", "N.Ireland", "Wales", "England")
 
 
+#-----------------------------
+#individual wordcloud
+#------------------------------------------------------------------------------
+
+mode(cloud_tdm)
+#cloud_tdm <- as.matrix(cloud_tdm)
+
+wordcloud(cloud_tdm, backgroundColor = "grey")
+
+
+
+dim(demoFreq)
+
+
+demoFreq[,2]+1
+
+
+
+
+
+
+cloud_tdm[1,]
+
+head(cloud_tdm)
+
+library(wordcloud)
+head(demoFreq)
+mode(demoFreq)
 #------------------------------------------------------------------------
 head(scot_tdm)
 dev.new()
 # comparison cloud
-comparison.cloud(tdm, random.order=FALSE, 
+comparison.cloud(cloud_tdm, random.order=FALSE, 
                  #colors = c("#00B2FF", "red", "#FF0099", "#6600CC"), 
 		     colors = c("cadetblue", "chartreuse4", "brown", "#E69F00"),
                  title.size=0.1, max.words=2000, match.colors=TRUE, title.colors=NULL)
@@ -112,6 +186,10 @@ commonality.cloud(tdm, random.order=FALSE,
                   title.size=1.5)
 
 
+wordcloud(cloud_tdm, random.order=FALSE, 
+                 #colors = c("#00B2FF", "red", "#FF0099", "#6600CC"), 
+                 colors = c("cadetblue", "chartreuse4", "brown", "#E69F00"),
+                 title.size=0.1, max.words=2000, match.colors=TRUE, title.colors=NULL)
 
 
 getwd()

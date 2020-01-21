@@ -6,9 +6,7 @@ library(stringr)
 setwd("F:/IndirefTweets/scottishRef")
 
 
-#old
-load("taxiTweets.RData")
-head(Meru_tweets)
+
 #new
 #get the tweets from each country
 data1 = read.table(file="./scottishIndy_byCountry_1.csv", sep=",", head=TRUE) 
@@ -22,6 +20,8 @@ data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) #2
 data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) #29,377
 
 data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9)
+
+rm(data1, data2, data3, data4, data5, data6, data7, data8, data9)
 
 #which(duplicated(data$status_id))
 #which(duplicated(data$status_id))
