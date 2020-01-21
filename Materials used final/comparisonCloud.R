@@ -14,7 +14,44 @@ wal = paste(walesTwt, collapse=" ")
 nir = paste(NITwt, collapse=" ")
 sco = paste(scotlandTwt, collapse=" ")
 
-#wordcloud(c(letters, LETTERS, 0:9), seq(1, 1000, len = 62))
+
+#wordcloud(c(letters, LETTERS, 0:9), seq(1, 1000, len = 62)) #library(tm)
+
+#remove the remaining special characters
+#function to remove special xters
+
+x <- "a1~!@#$%^&*(){}_+:\"<>?,./;'[]-=" #or whatever
+eng <- str_replace_all(eng, "[[:punct:]]", " ")
+wal <- str_replace_all(wal, "[[:punct:]]", " ")
+nir <- str_replace_all(nir, "[[:punct:]]", " ")
+sco <- str_replace_all(sco, "[[:punct:]]", " ")
+
+#remove
+eng = str_remove_all(eng, "[\n]")
+eng = str_remove_all(eng, "[\"]")
+
+wal = str_remove_all(wal, "[\n]")
+wal = str_remove_all(wal, "[\"]")
+
+nir = str_remove_all(nir, "[\n]")
+nir = str_remove_all(nir, "[\"]")
+
+sco = str_remove_all(sco, "[\n]")
+sco = str_remove_all(sco, "[\"]")
+
+#> [1] "n ppl"    "tw prs"   "thr bnns"
+
+# removeSpecialChars <- function(x) gsub("[^a-zA-Z0-9 ]", " ", x)
+# # remove special characters
+# 
+# englandTwt$text <- sapply(englandTwt$text, removeSpecialChars)
+# walesTwt$text <- sapply(walesTwt$text, removeSpecialChars)
+# NITwt$text <- sapply(NITwt$text, removeSpecialChars)
+# scotlandTwt$text <- sapply(scotlandTwt$text, removeSpecialChars)
+
+
+
+
 
 
 #change the order
@@ -23,7 +60,7 @@ all = c(sco, nir, wal, eng)
 # remove stop-words
 all = removeWords(all,stopwords("english"))
 
-#all
+head(all)
 
 # create corpus
 corpus = Corpus(VectorSource(all))

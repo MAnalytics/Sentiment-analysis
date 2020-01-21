@@ -1,3 +1,5 @@
+.libPaths("C:/R")
+
 library(stringr)
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
@@ -16,6 +18,7 @@ data4 = read.table(file="./scottishIndy_byCountry_4.csv", sep=",", head=TRUE)
 data5 = read.table(file="./scottishIndy_byCountry_5.csv", sep=",", head=TRUE) 
 data6 = read.table(file="./scottishIndy_byCountry_6.csv", sep=",", head=TRUE) 
 data7 = read.table(file="./scottishIndy_byCountry_7.csv", sep=",", head=TRUE) 
+data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) #29,377
 data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) #29,377
 
 data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9)
@@ -60,6 +63,7 @@ walesTwt$text <- sapply(walesTwt,function(row) iconv(row, "latin1", "ASCII", sub
 NITwt$text <- sapply(NITwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 scotlandTwt$text <- sapply(scotlandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 #head(englandTwt)
+
 
 # #remove duplicate tweets..
 # data("stop_words")

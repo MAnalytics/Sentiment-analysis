@@ -4,7 +4,7 @@
 library(dplyr) #Data manipulation (also included in the tidyverse package)
 library(tidytext) #Text mining
 library(tidyr) #Spread, separate, unite, text mining (also included in the tidyverse package)
-install.packages("widyr")
+
 ###library(widyr) #Use for pairwise correlation
 
 #Visualizations!
@@ -134,7 +134,7 @@ scotlandTwt$text <- sapply(scotlandTwt, fix.contractions)
 #head(scotlandTwt)
 
 #function to remove special xters
-removeSpecialChars <- function(x) gsub("[^a-zA-Z0-9 ]", " ", x)
+removeSpecialChars <- function(x) gsub("[^a-zA-Z0-9]", " ", x)
 # remove special characters
 
 englandTwt$text <- sapply(englandTwt$text, removeSpecialChars)
