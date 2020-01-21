@@ -1,10 +1,26 @@
 .libPaths("C:/R/Rlib")
 
-library(stringr)
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
 setwd("D:/IndirefTweets/scottishRef")
 
+#Visualizations!
+library(ggplot2) #Visualizations (also included in the tidyverse package)
+###library(ggrepel) #`geom_label_repel`
+library(gridExtra) #`grid.arrange()` for multi-graphs
+library(knitr) #Create nicely formatted output tables
+library(kableExtra) #Create nicely formatted output tables
+library(formattable) #For the color_tile function
+library(circlize) #Visualizations - chord diagram
+library(dplyr) #data manipulation
+library(ggplot2) #visualizations
+library(gridExtra) #viewing multiple plots together
+library(tidytext) #text mining
+library(stringr)
+require(tm)
+require(wordcloud)
+library(textdata)
+library(tidyr)
 
 
 #new
