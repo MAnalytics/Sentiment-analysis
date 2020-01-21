@@ -1,4 +1,4 @@
-#.libPaths("C:/R")
+.libPaths("C:/R/Rlib")
 
 library(stringr)
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
@@ -30,7 +30,9 @@ rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10)
 #remove duplicates
 data = data %>%
   dplyr::arrange(status_id) %>%
-  dplyr::filter(!duplicated(status_id))
+  dplyr::filter(!duplicated(status_id))%>%
+  dplyr::filter(is.na(reply_to_status_id))%>% #removes replies
+  dplyr::filter(is_retweet==FALSE) #remove retweets
   
 head(data)
 nrow(data)

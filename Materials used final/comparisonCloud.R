@@ -37,6 +37,7 @@ sco = paste(sco, collapse=" ")
 #remove the remaining special characters
 #function to remove special xters
 
+
 x <- "a1~!@#$%^&*(){}_+:\"<>?,./;'[]-=" #or whatever
 eng <- str_replace_all(eng, "[[:punct:]]", " ")
 wal <- str_replace_all(wal, "[[:punct:]]", " ")
@@ -138,7 +139,7 @@ wordcloud2(data.frame(cloud_tdm4), backgroundColor = "white")
 
 #England
 figPath = system.file("examples/Et.png",package = "wordcloud2")
-wordcloud2(data.frame(cloud_tdm1), figPath = figPath, size = 0.5,color = "skyblue")
+wordcloud2(data.frame(cloud_tdm1), figPath = figPath, size = 5,color = "skyblue")
 
 #Northern Ireland
 figPath = system.file("examples/N.png",package = "wordcloud2")
@@ -158,7 +159,13 @@ Note:
 
 nrow(demoFreq)
 
-
+library(wordcloud)
+dev.new()
+# comparison cloud
+comparison.cloud(cloud_tdm, random.order=FALSE, 
+                 #colors = c("#00B2FF", "red", "#FF0099", "#6600CC"), 
+		     colors = c("cadetblue", "chartreuse4", "brown", "#E69F00"),
+                 title.size=0.1, max.words=2000, match.colors=TRUE, title.colors=NULL)
 
 
 
