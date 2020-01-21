@@ -7,6 +7,9 @@ library(tidyr) #Spread, separate, unite, text mining (also included in the tidyv
 
 ###library(widyr) #Use for pairwise correlation
 
+install.packages(c("dplyr", "tidytext", "tidyr", "ggplot2", "gridExtra", "knitr", "kableExtra","formattable","circlize",
+		  "stringr", "tm","textdata"))
+
 #Visualizations!
 library(ggplot2) #Visualizations (also included in the tidyverse package)
 ###library(ggrepel) #`geom_label_repel`
