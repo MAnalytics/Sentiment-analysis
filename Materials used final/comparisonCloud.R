@@ -132,7 +132,32 @@ wordcloud2(data.frame(cloud_tdm2), backgroundColor = "white")
 wordcloud2(data.frame(cloud_tdm3), backgroundColor = "white")
 wordcloud2(data.frame(cloud_tdm4), backgroundColor = "white")
 
+#install library55131065
+#devtools::install_github("lchiffon/wordcloud2")
+#library(wordcloud2)
 
+
+figPath = system.file("examples/s1.png",package = "wordcloud2")
+wordcloud2(demoFreq, figPath = figPath, size = 0.5,color = "skyblue")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+figPath = system.file("examples/t.png",package = "wordcloud2")
+wordcloud2(demoFreq, figPath = figPath, size = 1.5,color = "skyblue")
 
 head(cloud_tdm)
 
@@ -218,16 +243,22 @@ dev.off()
 #Using wordcloud2 package
 library(wordcloud2)
 
+figPath = "/Users/monsu/Documents/GitHub/Sentiment-analysis/figures/scotland.png"
+
 figPath = system.file("examples/t.png",package = "wordcloud2")
+wordcloud2(demoFreq, figPath = figPath, size = 1.5,color = "skyblue")
+
+figPath = "/Users/monsu/Documents/GitHub/Sentiment-analysis/figures/scotland.png"
+
+
 
 figPath = "/Users/monsu/Documents/GitHub/Sentiment-analysis/figures/scotland.png"
 
 wordcloud2(demoFreq, figPath = figPath, size = 1.5,color = "skyblue")
 letterCloud(demoFreq, word = "R", size = 2)
 
-devtools::install_github("lchiffon/wordcloud2")
+wordcloud2(demoFreq, figPath=figPath, color = "skyblue")
 
-wordcloud2(head(most_words,100), figPath="/Users/username/Desktop/download.png" , size = .2, color = "skyblue")
 
 
 
