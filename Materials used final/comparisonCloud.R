@@ -57,12 +57,54 @@ head(scot_tdm)
 dev.new()
 # comparison cloud
 comparison.cloud(tdm, random.order=FALSE, 
-                 colors = c("#00B2FF", "red", "#FF0099", "#6600CC"), 
-                 title.size=1.5, max.words=500, match.colors=FALSE)
-
+                 #colors = c("#00B2FF", "red", "#FF0099", "#6600CC"), 
+		     colors = c("cadetblue", "chartreuse4", "brown", "#E69F00"),
+                 title.size=0.1, max.words=2000, match.colors=TRUE, title.colors=NULL)
+ 
 # # commonality cloud
 commonality.cloud(tdm, random.order=FALSE,
-                  colors = brewer.pal(8, "Dark2"),
+                  colors = brewer.pal(8, "Dark"), max.words=2000, 
                   title.size=1.5)
+
+
+getwd()
+
+dev.new()
+
+# -- STEP 3 : make the graphics !
+ 
+# Graph 1 : first top 500 discriminant words
+png("#102_1_comparison_cloud_top_500_words.png", width = 480, height = 480)
+comparison.cloud(tdm, max.words=2000, random.order=FALSE,c(4,0.4), title.size=1.4)
+dev.off()
+ 
+dev.new()
+# Graph 2 : first top 2000 discriminant words
+png("#102_1_comparison_cloud_top_2000_words.png", width = 480, height = 480)
+comparison.cloud(tdm,max.words=500,random.order=FALSE,c(4,0.4), title.size=1.4)
+#dev.off()
+ 
+# Graph 3: commonality word cloud : first top 2000 common words across classes
+png("#103_commonality_wordcloud.png", width = 480, height = 480)
+commonality.cloud(tdm, max.words=2000, random.order=FALSE)
+dev.off()
+
+
+#Using wordcloud2 package
+library(wordcloud2)
+
+figPath = system.file("examples/t.png",package = "wordcloud2")
+
+figPath = "/Users/monsu/Documents/GitHub/Sentiment-analysis/figures/scotland.png"
+
+wordcloud2(demoFreq, figPath = figPath, size = 1.5,color = "skyblue")
+letterCloud(demoFreq, word = "R", size = 2)
+
+devtools::install_github("lchiffon/wordcloud2")
+
+wordcloud2(head(most_words,100), figPath="/Users/username/Desktop/download.png" , size = .2, color = "skyblue")
+
+
+
 
 
