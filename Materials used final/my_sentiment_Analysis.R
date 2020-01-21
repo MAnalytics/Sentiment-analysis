@@ -25,16 +25,21 @@ library(dplyr) #data manipulation
 library(ggplot2) #visualizations
 library(gridExtra) #viewing multiple plots together
 library(tidytext) #text mining
+library(stringr)
+require(tm)
+require(wordcloud)
+library(textdata)
+
 
 #library(wordcloud2) #creative visualizations
 #reference: https://www.datacamp.com/community/tutorials/sentiment-analysis-R
 #https://www.youtube.com/watch?v=tfuzAwXmZOk make tranparent backgroup
-https://jokergoo.github.io/circlize_book/book/advanced-usage-of-chorddiagram.html     #best for the chart
+#https://jokergoo.github.io/circlize_book/book/advanced-usage-of-chorddiagram.html     #best for the chart
 #https://rpubs.com/brandonkopp/creating-word-clouds-in-r
 
 wordcloud2
 
-setwd("E:/IndirefTweets/scottishRef")
+setwd("F:/IndirefTweets/scottishRef")
 
 #old
 #load("taxiTweets.RData")
@@ -49,12 +54,12 @@ data5 = read.table(file="./scottishIndy_byCountry_5.csv", sep=",", head=TRUE)
 data6 = read.table(file="./scottishIndy_byCountry_6.csv", sep=",", head=TRUE) 
 data7 = read.table(file="./scottishIndy_byCountry_7.csv", sep=",", head=TRUE) 
 data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) #29,377
+data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) #29,377
 
+data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9)
 
-data = rbind(data1, data2, data3, data4, data5, data6, data7, data8)
 #which(duplicated(data$status_id))
 
-library(dplyr)
 
 #remove duplicates
 data = data %>%
@@ -66,7 +71,7 @@ nrow(data)
 
 unique(data$class)
 
-library(stringr)
+
 
 englandTwt <- data %>% dplyr::filter(class=="England") %>%
   dplyr::select(text) %>%
@@ -153,13 +158,7 @@ head(scotlandTwt)
 head(englandTwt)
 dim(englandTwt)
 
-#
-require(tm)
-require(wordcloud)
-library(formattable)
-library(textdata)
-library(circlize)
-library(tidytext)
+
 
 englandTwt$text <- sapply(englandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 walesTwt$text <- sapply(walesTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
@@ -252,7 +251,6 @@ circos.clear()
 #chordDiagram(UK_nrc, grid.col = grid.col, transparency = .2,annotationTrackHeight = c(0.06, 0.06))
 #title("Sentiment analysis")
 
-circos.clear()
 
 par(mfrow = c(1, 1))
 circos.par(start.degree = -3)
@@ -273,8 +271,6 @@ circos.par(start.degree = 0)
 chordDiagram(UK_nrc, grid.col = grid.col, big.gap = 20,annotationTrackHeight = c(0.06, 0.06))
 abline(h = 0, lty = 2, col = "#00000080")
 circos.clear()
-
-
 
 
 circos.track(track.index = 1, panel.fun = function(x, y) {

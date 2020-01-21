@@ -9,31 +9,22 @@
 # uber = paste(UberTweetsCleaned, collapse=" ")
 
 #new
-eng = paste(englandTwtCleaned, collapse=" ") #wal =englandTwtCleaned;  nir=englandTwtCleaned; sco=englandTwtCleaned
-#tweet = gsub("[ \t]{2,}", " ", tweet)
-wal = paste(walesTwtCleaned, collapse=" ")
-nir = paste(NITwtCleaned, collapse=" ")
-sco = paste(scotlandTwtCleaned, collapse=" ")
+eng = paste(englandTwt, collapse=" ") 
+wal = paste(walesTwt, collapse=" ")
+nir = paste(NITwt, collapse=" ")
+sco = paste(scotlandTwt, collapse=" ")
 
 #wordcloud(c(letters, LETTERS, 0:9), seq(1, 1000, len = 62))
 
-# put everything in a single vector
-#all = c(eng, wal, nir, sco) length(all)
+
+#change the order
 all = c(sco, nir, wal, eng)
 
 # remove stop-words
-require(tm)
-require(wordcloud)
 all = removeWords(all,stopwords("english"))
 
 #all
-#rm(list=ls())
-#old
-###all = removeWords(all,c("ola", "code", "app", "download", "sign","earn", "olacabs", "referral"))
-all = removeWords(all,c("otb", "fvf", "didnt", "also", "aaw", "gsym", "became", "will",
-                        "ifuy","irate","bit","fat","will", "put", "qvo"))
-all = removeWords(all,c("you", "your", "team", "address", "taxiforsure","taxi","for","sure"))
-all = removeWords(all,c("blame", "news", "uber", "delhi"))
+
 # create corpus
 corpus = Corpus(VectorSource(all))
 
@@ -47,12 +38,29 @@ head(tdm)
 # add column names
 ##colnames(tdm) = c("MeruCabs", "OlaCabs", "TaxiForSure", "UberIndia")
 
-#colnames(tdm) = c("England", "Wales", "N.Ireland", "Scotland")
 colnames(tdm) = c("Scotland", "N.Ireland", "Wales", "England")
 
-scot_tdm <- data.frame(cbind(word=row.names(tdm), freq=tdm[,4]))  #dim(scot_tdm)
-colnames(scot_tdm) <- c("word", "freq")
+install.packages("devtools")
+install.packages("wordcloud2")
+require(devtools)
+devtools::install_github("lchiffon/wordcloud2")
+library(wordcloud2)
+#-----------------------------
+#individual wordcloud
+#------------------------------------------------------------------------------
 
+head(cloud_tdm)
+
+
+cloud_tdm <- data.frame(cbind(word=row.names(tdm), freq=tdm[,1]))  #dim(scot_tdm)
+colnames(cloud_tdm) <- c("word", "freq")
+
+wordcloud2(cloud_tdm, backgroundColor = "grey")
+
+
+
+
+#------------------------------------------------------------------------
 head(scot_tdm)
 dev.new()
 # comparison cloud
@@ -65,6 +73,8 @@ comparison.cloud(tdm, random.order=FALSE,
 commonality.cloud(tdm, random.order=FALSE,
                   colors = brewer.pal(8, "Dark"), max.words=2000, 
                   title.size=1.5)
+
+
 
 
 getwd()
