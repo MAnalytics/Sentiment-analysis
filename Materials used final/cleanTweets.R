@@ -1,9 +1,9 @@
-.libPaths("C:/R")
+#.libPaths("C:/R")
 
 library(stringr)
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
-setwd("F:/IndirefTweets/scottishRef")
+setwd("D:/IndirefTweets/scottishRef")
 
 
 
@@ -18,10 +18,11 @@ data6 = read.table(file="./scottishIndy_byCountry_6.csv", sep=",", head=TRUE)
 data7 = read.table(file="./scottishIndy_byCountry_7.csv", sep=",", head=TRUE) 
 data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) #29,377
 data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) #29,377
+data10 = read.table(file="./scottishIndy_byCountry_10.csv", sep=",", head=TRUE) 
 
-data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9)
+data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10)
 
-rm(data1, data2, data3, data4, data5, data6, data7, data8, data9)
+rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10)
 
 #which(duplicated(data$status_id))
 #which(duplicated(data$status_id))
