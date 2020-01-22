@@ -1,5 +1,7 @@
 #for sentiment analysis....
 #has it's own cleaning function
+.libPaths("C:/R/Rlib")
+
 
 library(dplyr) #Data manipulation (also included in the tidyverse package)
 library(tidytext) #Text mining
@@ -7,8 +9,8 @@ library(tidyr) #Spread, separate, unite, text mining (also included in the tidyv
 
 ###library(widyr) #Use for pairwise correlation
 
-install.packages(c("dplyr", "tidytext", "tidyr", "ggplot2", "gridExtra", "knitr", "kableExtra","formattable","circlize",
-		  "stringr", "tm","textdata"))
+#install.packages(c("dplyr", "tidytext", "tidyr", "ggplot2", "gridExtra", "knitr", "kableExtra","formattable","circlize",
+		  #"stringr", "tm","textdata"))
 
 #Visualizations!
 library(ggplot2) #Visualizations (also included in the tidyverse package)
@@ -18,12 +20,6 @@ library(knitr) #Create nicely formatted output tables
 library(kableExtra) #Create nicely formatted output tables
 library(formattable) #For the color_tile function
 library(circlize) #Visualizations - chord diagram
-library(memery) #Memes - images with plots
-library(magick) #Memes - images with plots (image_read)
-library(yarrr)  #Pirate plot
-library(radarchart) #Visualizations
-library(igraph) #ngram network diagrams
-library(ggraph) #ngram network diagrams
 library(dplyr) #data manipulation
 library(ggplot2) #visualizations
 library(gridExtra) #viewing multiple plots together

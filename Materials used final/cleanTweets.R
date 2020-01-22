@@ -1,10 +1,26 @@
-.libPaths("C:/R")
+.libPaths("C:/R/Rlib")
 
+##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
+##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
+setwd("D:/IndirefTweets/scottishRef")
+
+#Visualizations!
+library(ggplot2) #Visualizations (also included in the tidyverse package)
+###library(ggrepel) #`geom_label_repel`
+library(gridExtra) #`grid.arrange()` for multi-graphs
+library(knitr) #Create nicely formatted output tables
+library(kableExtra) #Create nicely formatted output tables
+library(formattable) #For the color_tile function
+library(circlize) #Visualizations - chord diagram
+library(dplyr) #data manipulation
+library(ggplot2) #visualizations
+library(gridExtra) #viewing multiple plots together
+library(tidytext) #text mining
 library(stringr)
-##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
-##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
-setwd("F:/IndirefTweets/scottishRef")
-
+require(tm)
+require(wordcloud)
+library(textdata)
+library(tidyr)
 
 
 #new
@@ -18,10 +34,11 @@ data6 = read.table(file="./scottishIndy_byCountry_6.csv", sep=",", head=TRUE)
 data7 = read.table(file="./scottishIndy_byCountry_7.csv", sep=",", head=TRUE) 
 data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) #29,377
 data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) #29,377
+data10 = read.table(file="./scottishIndy_byCountry_10.csv", sep=",", head=TRUE) 
 
-data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9)
+data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10)
 
-rm(data1, data2, data3, data4, data5, data6, data7, data8, data9)
+rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10)
 
 #which(duplicated(data$status_id))
 #which(duplicated(data$status_id))
@@ -29,7 +46,9 @@ rm(data1, data2, data3, data4, data5, data6, data7, data8, data9)
 #remove duplicates
 data = data %>%
   dplyr::arrange(status_id) %>%
-  dplyr::filter(!duplicated(status_id))
+  dplyr::filter(!duplicated(status_id))%>%
+  dplyr::filter(is.na(reply_to_status_id))%>% #removes replies
+  dplyr::filter(is_retweet==FALSE) #remove retweets
   
 head(data)
 nrow(data)
