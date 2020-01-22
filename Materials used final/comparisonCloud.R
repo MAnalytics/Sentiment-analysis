@@ -109,24 +109,24 @@ write.table(cloud_tdm4, file="cloud4.csv", sep=",", row.names = F)
 cloud_tdm1 <- read.table(file="cloud1.csv", sep=",", head = TRUE)
 cloud_tdm1 <- cloud_tdm1[which(cloud_tdm1$word!="indyref"),]  #remove indiref
 cloud_tdm1 <- cloud_tdm1[order(-cloud_tdm1$freq1),]
-#cloud_tdm1 <- cloud_tdm1[1:500,]
+#cloud_tdm1 <- cloud_tdm1[1:1000,]
 
 cloud_tdm2 <- read.table(file="cloud2.csv", sep=",", head = TRUE)
 cloud_tdm2 <- cloud_tdm2[which(cloud_tdm2$word!="indyref"),]  #remove indiref
 cloud_tdm2 <- cloud_tdm2[order(-cloud_tdm2$freq1),]
-#cloud_tdm2 <- cloud_tdm2[1:500,]
+#cloud_tdm2 <- cloud_tdm2[1:1000,]
 
 
 cloud_tdm3 <- read.table(file="cloud3.csv", sep=",", head = TRUE)
 cloud_tdm3 <- cloud_tdm3[which(cloud_tdm3$word!="indyref"),]  #remove indiref
 cloud_tdm3 <- cloud_tdm3[order(-cloud_tdm3$freq1),]
-#cloud_tdm3 <- cloud_tdm3[1:500,]
+#cloud_tdm3 <- cloud_tdm3[1:1000,]
 
 
 cloud_tdm4 <- read.table(file="cloud4.csv", sep=",", head = TRUE)
 cloud_tdm4 <- cloud_tdm4[which(cloud_tdm4$word!="indyref"),]  #remove indiref
 cloud_tdm4 <- cloud_tdm4[order(-cloud_tdm4$freq1),]
-#cloud_tdm4 <- cloud_tdm4[1:500,]
+#cloud_tdm4 <- cloud_tdm4[1:1000,]
 
 # install.packages("devtools")
 # install.packages("wordcloud2")
@@ -134,12 +134,13 @@ cloud_tdm4 <- cloud_tdm4[order(-cloud_tdm4$freq1),]
 # devtools::install_github("lchiffon/wordcloud2")
 # library(wordcloud2)
 
-wordcloud2(data.frame(cloud_tdm1), backgroundColor = "white")
+wordcloud2(data.frame(cloud_tdm1), backgroundColor = "white", color="black")
 wordcloud2(data.frame(cloud_tdm2), backgroundColor = "white")
 wordcloud2(data.frame(cloud_tdm3), backgroundColor = "white")
 wordcloud2(data.frame(cloud_tdm4), backgroundColor = "white")
 
-
+combined_cloud_tdm1 <- head(cloud_tdm3)
+head(
 #England
 figPath = system.file("examples/Et.png",package = "wordcloud2")
 wordcloud2(data.frame(cloud_tdm1), figPath = figPath, size = 5,color = "skyblue")

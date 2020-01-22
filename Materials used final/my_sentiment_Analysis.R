@@ -3,10 +3,6 @@
 .libPaths("C:/R/Rlib")
 
 
-library(dplyr) #Data manipulation (also included in the tidyverse package)
-library(tidytext) #Text mining
-library(tidyr) #Spread, separate, unite, text mining (also included in the tidyverse package)
-
 ###library(widyr) #Use for pairwise correlation
 
 #install.packages(c("dplyr", "tidytext", "tidyr", "ggplot2", "gridExtra", "knitr", "kableExtra","formattable","circlize",
@@ -28,7 +24,7 @@ library(stringr)
 require(tm)
 require(wordcloud)
 library(textdata)
-
+library(tidyr)
 
 #library(wordcloud2) #creative visualizations
 #reference: https://www.datacamp.com/community/tutorials/sentiment-analysis-R
