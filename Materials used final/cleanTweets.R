@@ -35,15 +35,17 @@ data7 = read.table(file="./scottishIndy_byCountry_7.csv", sep=",", head=TRUE)
 data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) #29,377
 data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) #29,377
 data10 = read.table(file="./scottishIndy_byCountry_10.csv", sep=",", head=TRUE) 
+data11 = read.table(file="./scottishIndy_byCountry_11.csv", sep=",", head=TRUE) 
 
-data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10)
 
-rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10)
+data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11)
+
+rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11)
 
 #which(duplicated(data$status_id))
 #which(duplicated(data$status_id))
 
-#remove duplicates
+#remove duplicates, replies, and retweets
 data = data %>%
   dplyr::arrange(status_id) %>%
   dplyr::filter(!duplicated(status_id))%>%
@@ -52,7 +54,6 @@ data = data %>%
   
 head(data)
 nrow(data)
-
 
 
 englandTwt <- data %>% dplyr::filter(class=="England") %>%
@@ -84,15 +85,6 @@ scotlandTwt$text <- sapply(scotlandTwt,function(row) iconv(row, "latin1", "ASCII
 #head(englandTwt)
 
 
-# #remove duplicate tweets..
-# data("stop_words")
-
-# get a list of words
-#englandTwtCleaned <- englandTwt %>%
-#unnest_tokens(word, text) %>%
-#anti_join(stop_words) %>%
-#filter(!text %in% c("rt", "t.co"))
-
 #no need
 
 fix.contractions <- function(doc) {
@@ -111,6 +103,7 @@ fix.contractions <- function(doc) {
   doc <- gsub("'s", "", doc)
   return(doc)
 }
+
 
 englandTwt$text <- sapply(englandTwt , fix.contractions)
 walesTwt$text <- sapply(walesTwt , fix.contractions)
@@ -138,12 +131,18 @@ head(scotlandTwt)
 
 head(englandTwt)
 dim(englandTwt)
-
+dim(walesTwt)
+dim(NITwt)
+dim(scotlandTwt)
 
 englandTwt$text <- sapply(englandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 walesTwt$text <- sapply(walesTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 NITwt$text <- sapply(NITwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 scotlandTwt$text <- sapply(scotlandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+
+
+
+
 
 
 #Now go to comparison cloud
