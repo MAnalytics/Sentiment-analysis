@@ -8,7 +8,9 @@
 #https://www.r-bloggers.com/twitter-data-analysis-in-r/      #very good! equation for sentiment score.
 
 #setwd("C:/Users/monsu/Desktop/software paper/")
-setwd("C:/Users/monsu/Desktop/software paper/")
+#setwd("C:/Users/monsu/Desktop/software paper/")
+setwd("C:/R/tweets/")
+
 getwd()
 
 ## load rtweet
