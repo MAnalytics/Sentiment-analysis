@@ -61,10 +61,6 @@ testit <- function(x){
   proc.time() - p1 # The cpu usage should be negligible
 }
 
-
-
-
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -130,8 +126,8 @@ for(i in 1:length(unique_country)){ #i<-1
 ##uniq_Dates <- unique(all_Tweets$created_at)
 ##uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_TRIAL11.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_uniq_Dates_TRIAL11.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_TRIAL14.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_uniq_Dates_TRIAL14.csv", sep=",", row.names = F)
 #write_as_csv(tweets_g, "try.csv", na="NA", fileEncoding = "UTF-8")
 # 
 
@@ -227,8 +223,8 @@ for(j in 1:nrow(p_area_)){  #j<-1
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_TRIAL11.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_uniq_Dates_TRIAL11.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_TRIAL14.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_uniq_Dates_TRIAL14.csv", sep=",", row.names = F)
 #w
 
 
@@ -305,8 +301,8 @@ for(i in 1:length(unique_country)){ #i<-1
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_TRIAL11.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_uniq_Dates_TRIAL11.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_TRIAL14.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_uniq_Dates_TRIAL14.csv", sep=",", row.names = F)
 #write_as_csv(tweets_g, "try.csv", na="NA", fileEncoding = "UTF-8")
 # 
 #put system to sleep for 10 minutes
