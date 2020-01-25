@@ -5,6 +5,7 @@ library(colormap)
 library(fmsb)
 library(tidyr)
 library(radarchart)
+library(grDevices)
 
 
 ###library(widyr) #Use for pairwise correlation
@@ -323,25 +324,30 @@ par(mfrow=c(1,1))
  # Create data: note in High school for Jonathan:
 UK_bing_2 = UK_bing_ %>% select(-sentiment) 
 #sort as: 
-max_min = rbind(rep(70, 4), rep(0, 4))
+max_min = rbind(rep(75, 4), rep(0, 4))
 colnames(max_min) = c("Northern.Ireland", "Scotland", "Wales", "England")
 UK_bing_2 = rbind(max_min,UK_bing_2)
 row.names(UK_bing_2)<- c("1", "2", "negative","positive")
 
+#colors
+#https://www.rapidtables.com/web/color/RGB_Color.html
 # Color vector
-colors_border=c(rgb(0.2,0.5,0.5,0.9), rgb(0.8,0.2,0.5,0.9) , rgb(0.7,0.5,0.1,0.9) )
-colors_in=c( rgb(0.2,0.5,0.5,0.3), rgb(0.8,0.2,0.5,0.3) , rgb(0.7,0.5,0.1,0.3) )
 
+colors_border=c("#FF0000", rgb(0.255,0.69,0,0.9))
+colors_in=c(rgb(0.255,0,0,0.1), rgb(0.255,0.69,0,0.3))
+
+par(mar=rep(0.8,4))
+par(mfrow=c(1,1))
 
 # plot with default options:
 radarchart(UK_bing_2, axistype=1, seg=3,
     #custom polygon
     pcol=colors_border[1:2],
-    pfcol=colors_in[1:2], plwd=4, plty=5,cex=3,pch=3, 
+    pfcol=colors_in[1:2], plwd=4, plty=5,pch=3, 
     #custom the grid
-    cglcol="grey", cglty=2, axislabcol="grey", caxislabels=seq(0,70,10), cglwd=0.1,
+    cglcol="grey", cglty=2, axislabcol="grey", caxislabels=seq(0,75,25), cglwd=0.1,
     #custom labels
-    vlcex=0.8,
+    vlcex=1.2,
 )
 
 
@@ -364,8 +370,12 @@ UK_nrc_2 = rbind(max_min,UK_nrc_2)
 row.names(UK_nrc_2) <- 1:nrow(UK_nrc_2)
 
 # Prepare color
-colors_border=colormap(colormap=colormaps$viridis, nshades=4, alpha=1)
-colors_in=colormap(colormap=colormaps$viridis, nshades=4, alpha=0.3)
+colors_border=c(adjustcolor("#00BFFF", alpha.f = 1), adjustcolor("#FF8C00", alpha.f = 1), adjustcolor("green", alpha.f = 1), adjustcolor("#FFD700", alpha.f = 1))
+colors_in=c(adjustcolor("#00BFFF", alpha.f = 0.2), adjustcolor("#FF8C00", alpha.f = 0.2), adjustcolor("green", alpha.f = 0.2), adjustcolor("#FFD700", alpha.f = 0.2))
+
+
+#colors_border=colormap(colormap=colormaps$viridis, nshades=4, alpha=1)
+#colors_in=colormap(colormap=colormaps$viridis, nshades=4, alpha=0.3)
 
 # Split the screen in 6 parts
 par(mar=rep(0.8,4))
