@@ -32,15 +32,21 @@ data4 = read.table(file="./scottishIndy_byCountry_4.csv", sep=",", head=TRUE)
 data5 = read.table(file="./scottishIndy_byCountry_5.csv", sep=",", head=TRUE) 
 data6 = read.table(file="./scottishIndy_byCountry_6.csv", sep=",", head=TRUE) 
 data7 = read.table(file="./scottishIndy_byCountry_7.csv", sep=",", head=TRUE) 
-data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) #29,377
-data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) #29,377
+data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) 
+data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) 
 data10 = read.table(file="./scottishIndy_byCountry_10.csv", sep=",", head=TRUE) 
-data11 = read.table(file="./scottishIndy_byCountry_11.csv", sep=",", head=TRUE) 
+data11 = read.table(file="./scottishIndy_byCountry_11.csv", sep=",", head=TRUE)
+data12 = read.table(file="./scottishIndy_byCountry_12.csv", sep=",", head=TRUE) 
+data13 = read.table(file="./scottishIndy_byCountry_13.csv", sep=",", head=TRUE) 
+data14 = read.table(file="./scottishIndy_byCountry_14.csv", sep=",", head=TRUE) 
+data15 = read.table(file="./scottishIndy_byCountry_15.csv", sep=",", head=TRUE)  
 
 
-data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11)
+data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
+		data11, data12, data13, data14, data15)
 
-rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11)
+rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
+ 	data11, data12, data13, data14, data15)
 
 #which(duplicated(data$status_id))
 #which(duplicated(data$status_id))
