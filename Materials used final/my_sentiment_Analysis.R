@@ -1,6 +1,11 @@
 #for sentiment analysis....
 #has it's own cleaning function
 .libPaths("C:/R/Rlib")
+library(colormap)
+library(fmsb)
+library(tidyr)
+library(radarchart)
+library(grDevices)
 
 
 ###library(widyr) #Use for pairwise correlation
@@ -34,11 +39,13 @@ library(tidyr)
 
 wordcloud2
 
-setwd("F:/IndirefTweets/scottishRef")
+setwd("D:/IndirefTweets/scottishRef")
 
 #old
 #load("taxiTweets.RData")
 #head(Meru_tweets)
+#new
+#get the tweets from each country
 #new
 #get the tweets from each country
 data1 = read.table(file="./scottishIndy_byCountry_1.csv", sep=",", head=TRUE) 
@@ -48,18 +55,32 @@ data4 = read.table(file="./scottishIndy_byCountry_4.csv", sep=",", head=TRUE)
 data5 = read.table(file="./scottishIndy_byCountry_5.csv", sep=",", head=TRUE) 
 data6 = read.table(file="./scottishIndy_byCountry_6.csv", sep=",", head=TRUE) 
 data7 = read.table(file="./scottishIndy_byCountry_7.csv", sep=",", head=TRUE) 
-data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) #29,377
-data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) #29,377
+data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) 
+data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) 
+data10 = read.table(file="./scottishIndy_byCountry_10.csv", sep=",", head=TRUE) 
+data11 = read.table(file="./scottishIndy_byCountry_11.csv", sep=",", head=TRUE)
+data12 = read.table(file="./scottishIndy_byCountry_12.csv", sep=",", head=TRUE) 
+data13 = read.table(file="./scottishIndy_byCountry_13.csv", sep=",", head=TRUE) 
+data14 = read.table(file="./scottishIndy_byCountry_14.csv", sep=",", head=TRUE) 
+data15 = read.table(file="./scottishIndy_byCountry_15.csv", sep=",", head=TRUE)  
 
-data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9)
+
+data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
+		data11, data12, data13, data14, data15)
+
+rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
+ 	data11, data12, data13, data14, data15)
 
 #which(duplicated(data$status_id))
 
 
-#remove duplicates
+#remove duplicates, replies, and retweets
 data = data %>%
   dplyr::arrange(status_id) %>%
-  dplyr::filter(!duplicated(status_id))
+  dplyr::filter(!duplicated(status_id))%>%
+  dplyr::filter(is.na(reply_to_status_id))%>% #removes replies
+  dplyr::filter(is_retweet==FALSE) #remove retweets
+  
 
 head(data)
 nrow(data)
@@ -209,6 +230,7 @@ UK_nrc = data.frame(rbind(englandTwt_nrc, walesTwt_nrc, NITwt_nrc, scotlandTwt_n
 UK_bing = data.frame(rbind(englandTwt_bing, walesTwt_bing, NITwt_bing, scotlandTwt_bing))
 
 unique(UK_bing$sentiment) 
+head(UK_nrc)
 head(UK_bing)
 
 #Define some colors to use throughout
@@ -230,13 +252,13 @@ UK_nrc <-  UK_nrc %>%
   summarise(sentiment_sum = sum(n)) %>%
   ungroup()
 
-UK_bing<-  UK_bing %>%
+UK_bing <-  UK_bing %>%
   count(sentiment, country) %>%
   group_by(country, sentiment) %>%
   summarise(sentiment_sum = sum(n)) %>%
   ungroup()
 
-
+library(circlize)
 circos.clear()
 
 #----------------------------------nrc
@@ -272,6 +294,120 @@ circos.track(track.index = 1, panel.fun = function(x, y) {
     circos.text(CELL_META$xcenter, CELL_META$ylim[1], CELL_META$sector.index, 
         facing = "clockwise", niceFacing = TRUE, adj = c(0, 1))
 }, bg.border = NA) 
+
+
+#---------------------------------------------------------------------
+#---------------------------------------------------------------------
+
+UK_bing_ = UK_bing %>% 
+		group_by(country) %>%
+		dplyr::mutate(total=sum(sentiment_sum))%>%
+		mutate(pct=round((sentiment_sum/total)*100, digits=2))
+
+UK_nrc_ = UK_nrc %>% 
+		group_by(country) %>%
+		dplyr::mutate(total=sum(sentiment_sum))%>%
+		mutate(pct=round((sentiment_sum/total)*100, digits=2))
+
+UK_bing_ = data.frame(dcast(UK_bing_, sentiment ~ country))
+UK_nrc_ = data.frame(dcast(UK_nrc_, sentiment ~ country))
+
+write.table(UK_bing_, file="UK_bing_.csv", sep=",", row.names=F)
+write.table(UK_nrc_, file="UK_nrc_.csv", sep=",", row.names=F)
+
+#----------------------------------------------------------------------
+#Polarity chart
+#---------------------------------------------------------------------
+par(mar=rep(0.8,4))
+par(mfrow=c(1,1))
+
+ # Create data: note in High school for Jonathan:
+UK_bing_2 = UK_bing_ %>% select(-sentiment) 
+#sort as: 
+max_min = rbind(rep(75, 4), rep(0, 4))
+colnames(max_min) = c("Northern.Ireland", "Scotland", "Wales", "England")
+UK_bing_2 = rbind(max_min,UK_bing_2)
+row.names(UK_bing_2)<- c("1", "2", "negative","positive")
+
+#colors
+#https://www.rapidtables.com/web/color/RGB_Color.html
+# Color vector
+
+colors_border=c("#FF0000", rgb(0.255,0.69,0,0.9))
+colors_in=c(rgb(0.255,0,0,0.1), rgb(0.255,0.69,0,0.3))
+
+par(mar=rep(0.8,4))
+par(mfrow=c(1,1))
+
+# plot with default options:
+radarchart(UK_bing_2, axistype=1, seg=3,
+    #custom polygon
+    pcol=colors_border[1:2],
+    pfcol=colors_in[1:2], plwd=4, plty=5,pch=3, 
+    #custom the grid
+    cglcol="grey", cglty=2, axislabcol="grey", caxislabels=seq(0,75,25), cglwd=0.1,
+    #custom labels
+    vlcex=1.2,
+)
+
+
+#----------------------------------------------------------------------
+#Emotion chart
+#----------------------------------------------------------------------
+# Create data: note in High school for Jonathan:
+UK_nrc_2 = UK_nrc_ %>% gather(Country, valname, -sentiment) %>% spread(sentiment, valname)
+#sort as: 
+reference = c("Northern.Ireland", "Scotland", "Wales", "England")
+UK_nrc_2 <- UK_nrc_2[match(reference, UK_nrc_2$Country),]
+
+UK_nrc_2
+mytitle <- as.character(unlist((UK_nrc_2 %>% select(Country))))
+UK_nrc_2 = UK_nrc_2 %>% select(-Country)
+max_min = rbind(rep(24, 8), rep(0, 8))
+colnames(max_min)<- c("anger","anticipation","disgust","fear","joy","sadness","surprise","trust")
+row.names(max_min) <- 1:nrow(max_min)
+UK_nrc_2 = rbind(max_min,UK_nrc_2)
+row.names(UK_nrc_2) <- 1:nrow(UK_nrc_2)
+
+# Prepare color
+colors_border=c(adjustcolor("#00BFFF", alpha.f = 1), adjustcolor("#FF8C00", alpha.f = 1), adjustcolor("green", alpha.f = 1), adjustcolor("#FFD700", alpha.f = 1))
+colors_in=c(adjustcolor("#00BFFF", alpha.f = 0.2), adjustcolor("#FF8C00", alpha.f = 0.2), adjustcolor("green", alpha.f = 0.2), adjustcolor("#FFD700", alpha.f = 0.2))
+
+
+#colors_border=colormap(colormap=colormaps$viridis, nshades=4, alpha=1)
+#colors_in=colormap(colormap=colormaps$viridis, nshades=4, alpha=0.3)
+
+# Split the screen in 6 parts
+par(mar=rep(0.8,4))
+par(mfrow=c(2,2))
+
+# Loop for each plot
+for(i in 1:4){ #i=4
+  # Custom the radarChart !
+  radarchart(UK_nrc_2[c(1,2,i+2),], axistype=1, seg=3,
+    #custom polygon
+    pcol=colors_border[i] , pfcol=colors_in[i] , plwd=4, plty=1 , 
+    #custom the grid
+    cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,24,8), cglwd=0.8,
+    #custom labels
+    vlcex=0.8,
+    #title
+    title=mytitle[i]
+    )
+}
+
+
+#---------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
 
 
 
