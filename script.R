@@ -138,6 +138,7 @@ write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis
 
 head(all_Tweets)
 
+ testit(700)
 
 
 #Data download by Voting result
@@ -323,15 +324,33 @@ write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis
 #put system to sleep for 10 minutes
 
 
+a <- list(1:10, letters)
+
+library(testthat)
+expect_output(str(a), "List of 2")
+
+expect_output(str(a), "int [1:9]", fixed = TRUE)
+
+string <- "Testing is fun!"
+expect_match(string, "Testing")
+
+expect_match(string, "Testing", ignore.case = TRUE)
+
+expect_message(), expect_warning(), expect_error()
+expect_error(1 / "a", "non-numeric argument")
+expect_warning(log(-1), "NaNs produced")
+expect_warning(log(0))
+expect_error(1 / 2) 
+model <- lm(mpg ~ wt, data = mtcars)
+expect_is(model, "lm")
+expect_is(model, "glm")
+30
 
 
+base <- as.POSIXct("2009-08-03 12:01:59.23", tz = "UTC")
 
-
-
-
-
-
-
+expect_equal(floor_date(base, "second"), 
+    as.POSIXct("2009-08-03 12:01:59", tz = "UTC"))
 
 
 
