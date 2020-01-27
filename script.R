@@ -126,8 +126,8 @@ for(i in 1:length(unique_country)){ #i<-1
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_TRIAL17.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_uniq_Dates_TRIAL17.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_TRIAL19.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/scottishIndy_byCountry_uniq_Dates_TRIAL19.csv", sep=",", row.names = F)
 
 
 #write_as_csv(all_Tweets, file="C:/R/tweets/scottishIndy_byCountry_TRIAL18.csv", na="NA", fileEncoding = "UTF-8")
@@ -229,8 +229,8 @@ for(j in 1:nrow(p_area_)){  #j<-1
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_TRIAL17.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_uniq_Dates_TRIAL17.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_TRIAL19.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byVoting_uniq_Dates_TRIAL19.csv", sep=",", row.names = F)
 #w
 
 #write_as_csv(all_Tweets, file="C:/R/tweets/download_byVoting_TRIAL15.csv", na="NA", fileEncoding = "UTF-8")
@@ -312,8 +312,8 @@ for(i in 1:length(unique_country)){ #i<-1
 uniq_Dates <- unique(all_Tweets$created_at)
 uniq_Dates <- uniq_Dates[order(uniq_Dates)]
 
-write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_TRIAL17.csv", na="NA", fileEncoding = "UTF-8")
-write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_uniq_Dates_TRIAL17.csv", sep=",", row.names = F)
+write_as_csv(all_Tweets, "C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_TRIAL19.csv", na="NA", fileEncoding = "UTF-8")
+write.table(uniq_Dates, file="C:/Users/monsu/Documents/GitHub/Sentiment-analysis/download_byCountry_uniq_Dates_TRIAL19.csv", sep=",", row.names = F)
 
 # 
 
@@ -349,10 +349,15 @@ expect_is(model, "glm")
 
 base <- as.POSIXct("2009-08-03 12:01:59.23", tz = "UTC")
 
-expect_equal(floor_date(base, "second"), 
+expect_equal(floor_date(base, "minute"), 
     as.POSIXct("2009-08-03 12:01:59", tz = "UTC"))
 
+expect_equal(floor_date(base, "minute"), 
+    as.POSIXct("2009-08-03 12:01:00", tz = "UTC"))
 
+skip_on_cran()
+
+expect_equal()
 
 
 
