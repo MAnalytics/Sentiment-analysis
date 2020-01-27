@@ -1,8 +1,9 @@
-.libPaths("C:/R/Rlib")
-
+.libPaths("C:/R/Rlib") #uni lap
+.libPaths("C:/R") #uni deskp
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
 setwd("D:/IndirefTweets/scottishRef")
+setwd("F:/IndirefTweets/scottishRef") #uni desk
 
 #Visualizations!
 library(ggplot2) #Visualizations (also included in the tidyverse package)
@@ -40,13 +41,18 @@ data12 = read.table(file="./scottishIndy_byCountry_12.csv", sep=",", head=TRUE)
 data13 = read.table(file="./scottishIndy_byCountry_13.csv", sep=",", head=TRUE) 
 data14 = read.table(file="./scottishIndy_byCountry_14.csv", sep=",", head=TRUE) 
 data15 = read.table(file="./scottishIndy_byCountry_15.csv", sep=",", head=TRUE)  
+data16 = read.table(file="./scottishIndy_byCountry_16.csv", sep=",", head=TRUE)  
+data17 = read.table(file="./scottishIndy_byCountry_17.csv", sep=",", head=TRUE)  
+data18 = read.table(file="./scottishIndy_byCountry_18.csv", sep=",", head=TRUE)  
+data19 = read.table(file="./scottishIndy_byCountry_19.csv", sep=",", head=TRUE)  
+data20 = read.table(file="./scottishIndy_byCountry_20.csv", sep=",", head=TRUE)  
 
 
 data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
-		data11, data12, data13, data14, data15)
+		data11, data12, data13, data14, data15, data16, data17, data18, data19, data20)
 
 rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
- 	data11, data12, data13, data14, data15)
+ 	data11, data12, data13, data14, data15, data16, data17, data18, data19, data20)
 
 #which(duplicated(data$status_id))
 #which(duplicated(data$status_id))
