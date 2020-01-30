@@ -9,7 +9,7 @@
 
 #setwd("C:/Users/monsu/Desktop/software paper/")
 setwd("C:/Users/monsu/Desktop/software paper/")
-#setwd("C:/R/tweets/")
+setwd("C:/R/tweets/")
 
 getwd()
 
