@@ -2,7 +2,7 @@
 .libPaths("C:/R") #uni deskp
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
-setwd("D:/IndirefTweets/scottishRef")
+setwd("D:/IndirefTweets/scottishRef") #'uni lap'
 setwd("F:/IndirefTweets/scottishRef") #uni desk
 
 #Visualizations!
@@ -46,13 +46,20 @@ data17 = read.table(file="./scottishIndy_byCountry_17.csv", sep=",", head=TRUE)
 data18 = read.table(file="./scottishIndy_byCountry_18.csv", sep=",", head=TRUE)  
 data19 = read.table(file="./scottishIndy_byCountry_19.csv", sep=",", head=TRUE)  
 data20 = read.table(file="./scottishIndy_byCountry_20.csv", sep=",", head=TRUE)  
+data21 = read.table(file="./scottishIndy_byCountry_21.csv", sep=",", head=TRUE)  
+data22 = read.table(file="./scottishIndy_byCountry_22.csv", sep=",", head=TRUE)  
+data23 = read.table(file="./scottishIndy_byCountry_23.csv", sep=",", head=TRUE)  
+data24 = read.table(file="./scottishIndy_byCountry_24.csv", sep=",", head=TRUE)  
+data25 = read.table(file="./scottishIndy_byCountry_25.csv", sep=",", head=TRUE)  
 
 
 data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
-		data11, data12, data13, data14, data15, data16, data17, data18, data19, data20)
+		data11, data12, data13, data14, data15, data16, data17, data18, data19, data20,
+		data21, data22, data23, data24, data25)
 
 rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
- 	data11, data12, data13, data14, data15, data16, data17, data18, data19, data20)
+ 	data11, data12, data13, data14, data15, data16, data17, data18, data19, data20,
+   data21, data22, data23, data24, data25)
 
 #which(duplicated(data$status_id))
 #which(duplicated(data$status_id))
