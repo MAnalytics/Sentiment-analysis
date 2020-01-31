@@ -90,8 +90,16 @@ tdm = TermDocumentMatrix(corpus)
 tdm = as.matrix(tdm)   #tdm[500:2030,]
 head(tdm)
 
+#df_tdm=data.frame(tdm)
+#df_tdm[which(row.names(df_tdm)=="brexit"),]
+
+tdm[1139, 2] <- 6 #nir
+tdm[1139, 3] <- 6 #nir
+
+
 
 cloud_tdm1 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,1])) 
+head(cloud_tdm1)
 row.names(cloud_tdm1) <- as.vector(row.names(tdm))
 cloud_tdm2 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,2])) 
 row.names(cloud_tdm2) <- as.vector(row.names(tdm))
@@ -143,13 +151,18 @@ cloud_tdm4 <- cloud_tdm4[1:1000,]
 # devtools::install_github("lchiffon/wordcloud2")
 # library(wordcloud2)
 
-wordcloud2(data.frame(cloud_tdm1), backgroundColor = "white")
-wordcloud2(data.frame(cloud_tdm2), backgroundColor = "white")
-wordcloud2(data.frame(cloud_tdm3), backgroundColor = "white")
-wordcloud2(data.frame(cloud_tdm4), backgroundColor = "white")
+#order {all = c(sco, nir, wal, eng)}
+#scotland
+wordcloud2(data.frame(cloud_tdm1), backgroundColor = "white", size = 1, minRotation = -pi/6, maxRotation = -pi/6, rotateRatio = 1)
+#northern ireland
+wordcloud2(data.frame(cloud_tdm2), backgroundColor = "white", size = 1, minRotation = pi/6, maxRotation = pi/6, rotateRatio = 1)
+#Wales
+wordcloud2(data.frame(cloud_tdm3), backgroundColor = "white", size = 1, minRotation = pi/6, maxRotation = pi/6, rotateRatio = 1)
+#England
+wordcloud2(data.frame(cloud_tdm4), backgroundColor = "white", size = 1, minRotation = -pi/6, maxRotation = -pi/6, rotateRatio = 1)
 
 combined_cloud_tdm1 <- head(cloud_tdm3)
-head(
+#head(
 #England
 figPath = system.file("examples/Et.png",package = "wordcloud2")
 wordcloud2(data.frame(cloud_tdm1), figPath = figPath, size = 5,color = "skyblue")
