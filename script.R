@@ -8,7 +8,8 @@
 #https://www.r-bloggers.com/twitter-data-analysis-in-r/      #very good! equation for sentiment score.
 
 #setwd("C:/Users/monsu/Desktop/software paper/")
-setwd("C:/Users/monsu/Desktop/software paper/")
+#setwd("C:/Users/monsu/Desktop/software paper/")
+setwd("C:/Users/monsu/Desktop/policeTweets/")
 #setwd("C:/R/tweets/")
 
 getwd()
@@ -18,7 +19,7 @@ library(rtweet)
 library(ggplot2)
 library(dplyr)
 library(tidytext)
-library(twitteR)
+#library(twitteR)
 library(ROAuth)
 library(NLP)#, lib.loc="~/R/win-library/3.3")
 library(twitteR)#, lib.loc="~/R/win-library/3.3")
