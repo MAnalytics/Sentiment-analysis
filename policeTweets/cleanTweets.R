@@ -2,8 +2,8 @@
 .libPaths("C:/R") #uni deskp
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
 ##setwd("C:/Users/monsu/Desktop/downloaded tweets/scottishRef")
-setwd("D:/IndirefTweets/scottishRef") #'uni lap'
-setwd("F:/IndirefTweets/scottishRef") #uni desk
+# setwd("D:/IndirefTweets/scottishRef") #'uni lap'
+# setwd("F:/IndirefTweets/scottishRef") #uni desk
 
 #Visualizations!
 library(ggplot2) #Visualizations (also included in the tidyverse package)
@@ -25,42 +25,16 @@ library(tidyr)
 
 
 #new
-#get the tweets from each country
-data1 = read.table(file="./scottishIndy_byCountry_1.csv", sep=",", head=TRUE) 
-data2 = read.table(file="./scottishIndy_byCountry_2.csv", sep=",", head=TRUE) 
-data3 = read.table(file="./scottishIndy_byCountry_3.csv", sep=",", head=TRUE) 
-data4 = read.table(file="./scottishIndy_byCountry_4.csv", sep=",", head=TRUE) 
-data5 = read.table(file="./scottishIndy_byCountry_5.csv", sep=",", head=TRUE) 
-data6 = read.table(file="./scottishIndy_byCountry_6.csv", sep=",", head=TRUE) 
-data7 = read.table(file="./scottishIndy_byCountry_7.csv", sep=",", head=TRUE) 
-data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) 
-data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) 
-data10 = read.table(file="./scottishIndy_byCountry_10.csv", sep=",", head=TRUE) 
-data11 = read.table(file="./scottishIndy_byCountry_11.csv", sep=",", head=TRUE)
-data12 = read.table(file="./scottishIndy_byCountry_12.csv", sep=",", head=TRUE) 
-data13 = read.table(file="./scottishIndy_byCountry_13.csv", sep=",", head=TRUE) 
-data14 = read.table(file="./scottishIndy_byCountry_14.csv", sep=",", head=TRUE) 
-data15 = read.table(file="./scottishIndy_byCountry_15.csv", sep=",", head=TRUE)  
-data16 = read.table(file="./scottishIndy_byCountry_16.csv", sep=",", head=TRUE)  
-data17 = read.table(file="./scottishIndy_byCountry_17.csv", sep=",", head=TRUE)  
-data18 = read.table(file="./scottishIndy_byCountry_18.csv", sep=",", head=TRUE)  
-data19 = read.table(file="./scottishIndy_byCountry_19.csv", sep=",", head=TRUE)  
-data20 = read.table(file="./scottishIndy_byCountry_20.csv", sep=",", head=TRUE)  
-data21 = read.table(file="./scottishIndy_byCountry_21.csv", sep=",", head=TRUE)  
-data22 = read.table(file="./scottishIndy_byCountry_22.csv", sep=",", head=TRUE)  
-data23 = read.table(file="./scottishIndy_byCountry_23.csv", sep=",", head=TRUE)  
-data24 = read.table(file="./scottishIndy_byCountry_24.csv", sep=",", head=TRUE)  
-data25 = read.table(file="./scottishIndy_byCountry_25.csv", sep=",", head=TRUE)  
+data1 = read.table(file="./policeTweet_set_1_.csv", sep=",", head=TRUE) 
+data2 = read.table(file="./policeTweet_set_2_.csv", sep=",", head=TRUE) 
 
+data = rbind(data1, data2) #, data3, data4, data5, data6, data7, data8, data9, data10, 
+#data11, data12, data13, data14, data15, data16, data17, data18, data19, data20,
+#data21, data22, data23, data24, data25)
 
-data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
-		data11, data12, data13, data14, data15, data16, data17, data18, data19, data20,
-		data21, data22, data23, data24, data25)
-
-rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
- 	data11, data12, data13, data14, data15, data16, data17, data18, data19, data20,
-   data21, data22, data23, data24, data25)
-
+rm(data1, data2)#, data3, data4, data5, data6, data7, data8, data9, data10, 
+#data11, data12, data13, data14, data15, data16, data17, data18, data19, data20,
+#data21, data22, data23, data24, data25)
 #which(duplicated(data$status_id))
 #which(duplicated(data$status_id))
 
@@ -75,33 +49,18 @@ head(data)
 nrow(data)
 
 
-englandTwt <- data %>% dplyr::filter(class=="England") %>%
+englandTwt <- data %>% #dplyr::filter(class=="England") %>%
   dplyr::select(text) %>%
   dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
   mutate(text=str_replace_all(text, "[[:punct:]]", " ")) #%>%
 ##mutate(day=as.Date(as.character(substr(created_at,1,10)), format = "%d"))
 
-walesTwt <- data %>% dplyr::filter(class=="Wales") %>%
-  dplyr::select(text) %>%
-  dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
-  mutate(text=str_replace_all(text, "[[:punct:]]", " ")) #%>%
-
-NITwt <- data %>% dplyr::filter(class=="Northern Ireland") %>%
-  dplyr::select(text) %>%
-  dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
-  mutate(text=str_replace_all(text, "[[:punct:]]", " ")) #%>%
-
-scotlandTwt <- data %>% dplyr::filter(class=="Scotland") %>%
-  dplyr::select(text) %>%
-  dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
-  mutate(text=str_replace_all(text, "[[:punct:]]", " ")) #%>%
-
 #remove emoticons
 englandTwt$text <- sapply(englandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-walesTwt$text <- sapply(walesTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-NITwt$text <- sapply(NITwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-scotlandTwt$text <- sapply(scotlandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-#head(englandTwt)
+# walesTwt$text <- sapply(walesTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# NITwt$text <- sapply(NITwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# scotlandTwt$text <- sapply(scotlandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# #head(englandTwt)
 
 
 #no need
@@ -125,39 +84,39 @@ fix.contractions <- function(doc) {
 
 
 englandTwt$text <- sapply(englandTwt , fix.contractions)
-walesTwt$text <- sapply(walesTwt , fix.contractions)
-NITwt$text <- sapply(NITwt , fix.contractions)
-scotlandTwt$text <- sapply(scotlandTwt, fix.contractions)
-#head(scotlandTwt)
+# walesTwt$text <- sapply(walesTwt , fix.contractions)
+# NITwt$text <- sapply(NITwt , fix.contractions)
+# scotlandTwt$text <- sapply(scotlandTwt, fix.contractions)
+# #head(scotlandTwt)
 
 #function to remove special xters
 removeSpecialChars <- function(x) gsub("[^a-zA-Z0-9 ]", " ", x)
 # remove special characters
 
 englandTwt$text <- sapply(englandTwt$text, removeSpecialChars)
-walesTwt$text <- sapply(walesTwt$text, removeSpecialChars)
-NITwt$text <- sapply(NITwt$text, removeSpecialChars)
-scotlandTwt$text <- sapply(scotlandTwt$text, removeSpecialChars)
+# walesTwt$text <- sapply(walesTwt$text, removeSpecialChars)
+# NITwt$text <- sapply(NITwt$text, removeSpecialChars)
+# scotlandTwt$text <- sapply(scotlandTwt$text, removeSpecialChars)
 
 # convert everything to lower case
 englandTwt$text <- sapply(englandTwt$text, tolower)
-walesTwt$text <- sapply(walesTwt$text, tolower)
-NITwt$text <- sapply(NITwt$text, tolower)
-scotlandTwt$text <- sapply(scotlandTwt$text, tolower)
-
-head(scotlandTwt)
+# walesTwt$text <- sapply(walesTwt$text, tolower)
+# NITwt$text <- sapply(NITwt$text, tolower)
+# scotlandTwt$text <- sapply(scotlandTwt$text, tolower)
+# 
+# head(scotlandTwt)
 
 
 head(englandTwt)
 dim(englandTwt)
-dim(walesTwt)
-dim(NITwt)
-dim(scotlandTwt)
+# dim(walesTwt)
+# dim(NITwt)
+# dim(scotlandTwt)
 
 englandTwt$text <- sapply(englandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-walesTwt$text <- sapply(walesTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-NITwt$text <- sapply(NITwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-scotlandTwt$text <- sapply(scotlandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# walesTwt$text <- sapply(walesTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# NITwt$text <- sapply(NITwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# scotlandTwt$text <- sapply(scotlandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 
 
 

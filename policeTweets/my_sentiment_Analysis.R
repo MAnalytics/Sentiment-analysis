@@ -48,28 +48,18 @@ setwd("D:/IndirefTweets/scottishRef")
 #get the tweets from each country
 #new
 #get the tweets from each country
-data1 = read.table(file="./scottishIndy_byCountry_1.csv", sep=",", head=TRUE) 
-data2 = read.table(file="./scottishIndy_byCountry_2.csv", sep=",", head=TRUE) 
-data3 = read.table(file="./scottishIndy_byCountry_3.csv", sep=",", head=TRUE) 
-data4 = read.table(file="./scottishIndy_byCountry_4.csv", sep=",", head=TRUE) 
-data5 = read.table(file="./scottishIndy_byCountry_5.csv", sep=",", head=TRUE) 
-data6 = read.table(file="./scottishIndy_byCountry_6.csv", sep=",", head=TRUE) 
-data7 = read.table(file="./scottishIndy_byCountry_7.csv", sep=",", head=TRUE) 
-data8 = read.table(file="./scottishIndy_byCountry_8.csv", sep=",", head=TRUE) 
-data9 = read.table(file="./scottishIndy_byCountry_9.csv", sep=",", head=TRUE) 
-data10 = read.table(file="./scottishIndy_byCountry_10.csv", sep=",", head=TRUE) 
-data11 = read.table(file="./scottishIndy_byCountry_11.csv", sep=",", head=TRUE)
-data12 = read.table(file="./scottishIndy_byCountry_12.csv", sep=",", head=TRUE) 
-data13 = read.table(file="./scottishIndy_byCountry_13.csv", sep=",", head=TRUE) 
-data14 = read.table(file="./scottishIndy_byCountry_14.csv", sep=",", head=TRUE) 
-data15 = read.table(file="./scottishIndy_byCountry_15.csv", sep=",", head=TRUE)  
+#get the tweets from each country
+data1 = read.table(file="./policeTweet_set_1_.csv", sep=",", head=TRUE) 
+data2 = read.table(file="./policeTweet_set_2_.csv", sep=",", head=TRUE) 
 
+data = rbind(data1, data2) #, data3, data4, data5, data6, data7, data8, data9, data10, 
+#data11, data12, data13, data14, data15, data16, data17, data18, data19, data20,
+#data21, data22, data23, data24, data25)
 
-data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
-		data11, data12, data13, data14, data15)
+rm(data1, data2)#, data3, data4, data5, data6, data7, data8, data9, data10, 
+#data11, data12, data13, data14, data15, data16, data17, data18, data19, data20,
+#data21, data22, data23, data24, data25)
 
-rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
- 	data11, data12, data13, data14, data15)
 
 #which(duplicated(data$status_id))
 
@@ -89,33 +79,33 @@ unique(data$class)
 
 
 
-englandTwt <- data %>% dplyr::filter(class=="England") %>%
+englandTwt <- data %>% #dplyr::filter(class=="England") %>%
   dplyr::select(text) %>%
   dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
   mutate(text=str_replace_all(text, "[[:punct:]]", " ")) #%>%
 ##mutate(day=as.Date(as.character(substr(created_at,1,10)), format = "%d"))
 
-walesTwt <- data %>% dplyr::filter(class=="Wales") %>%
-  dplyr::select(text) %>%
-  dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
-  mutate(text=str_replace_all(text, "[[:punct:]]", " ")) #%>%
-
-NITwt <- data %>% dplyr::filter(class=="Northern Ireland") %>%
-  dplyr::select(text) %>%
-  dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
-  mutate(text=str_replace_all(text, "[[:punct:]]", " ")) #%>%
-
-scotlandTwt <- data %>% dplyr::filter(class=="Scotland") %>%
-  dplyr::select(text) %>%
-  dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
-  mutate(text=str_replace_all(text, "[[:punct:]]", " ")) #%>%
+# walesTwt <- data %>% dplyr::filter(class=="Wales") %>%
+#   dplyr::select(text) %>%
+#   dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
+#   mutate(text=str_replace_all(text, "[[:punct:]]", " ")) #%>%
+# 
+# NITwt <- data %>% dplyr::filter(class=="Northern Ireland") %>%
+#   dplyr::select(text) %>%
+#   dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
+#   mutate(text=str_replace_all(text, "[[:punct:]]", " ")) #%>%
+# 
+# scotlandTwt <- data %>% dplyr::filter(class=="Scotland") %>%
+#   dplyr::select(text) %>%
+#   dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
+#   mutate(text=str_replace_all(text, "[[:punct:]]", " ")) #%>%
 
 #remove emoticons
 englandTwt$text <- sapply(englandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-walesTwt$text <- sapply(walesTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-NITwt$text <- sapply(NITwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-scotlandTwt$text <- sapply(scotlandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-#head(englandTwt)
+# walesTwt$text <- sapply(walesTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# NITwt$text <- sapply(NITwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# scotlandTwt$text <- sapply(scotlandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# #head(englandTwt)
 
 # #remove duplicate tweets..
 # data("stop_words")
@@ -144,25 +134,25 @@ fix.contractions <- function(doc) {
 }
 
 englandTwt$text <- sapply(englandTwt , fix.contractions)
-walesTwt$text <- sapply(walesTwt , fix.contractions)
-NITwt$text <- sapply(NITwt , fix.contractions)
-scotlandTwt$text <- sapply(scotlandTwt, fix.contractions)
-#head(scotlandTwt)
+# walesTwt$text <- sapply(walesTwt , fix.contractions)
+# NITwt$text <- sapply(NITwt , fix.contractions)
+# scotlandTwt$text <- sapply(scotlandTwt, fix.contractions)
+# #head(scotlandTwt)
 
 #function to remove special xters
 removeSpecialChars <- function(x) gsub("[^a-zA-Z0-9]", " ", x)
 # remove special characters
 
 englandTwt$text <- sapply(englandTwt$text, removeSpecialChars)
-walesTwt$text <- sapply(walesTwt$text, removeSpecialChars)
-NITwt$text <- sapply(NITwt$text, removeSpecialChars)
-scotlandTwt$text <- sapply(scotlandTwt$text, removeSpecialChars)
+# walesTwt$text <- sapply(walesTwt$text, removeSpecialChars)
+# NITwt$text <- sapply(NITwt$text, removeSpecialChars)
+# scotlandTwt$text <- sapply(scotlandTwt$text, removeSpecialChars)
 
 # convert everything to lower case
 englandTwt$text <- sapply(englandTwt$text, tolower)
-walesTwt$text <- sapply(walesTwt$text, tolower)
-NITwt$text <- sapply(NITwt$text, tolower)
-scotlandTwt$text <- sapply(scotlandTwt$text, tolower)
+# walesTwt$text <- sapply(walesTwt$text, tolower)
+# NITwt$text <- sapply(NITwt$text, tolower)
+# scotlandTwt$text <- sapply(scotlandTwt$text, tolower)
 
 head(scotlandTwt)
 #new
@@ -177,9 +167,9 @@ dim(englandTwt)
 
 
 englandTwt$text <- sapply(englandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-walesTwt$text <- sapply(walesTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-NITwt$text <- sapply(NITwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-scotlandTwt$text <- sapply(scotlandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# walesTwt$text <- sapply(walesTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# NITwt$text <- sapply(NITwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+# scotlandTwt$text <- sapply(scotlandTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 
 
 #create the data..
@@ -193,56 +183,56 @@ englandTwt_bing <- englandTwt %>%
   inner_join(get_sentiments("bing")) %>% #join with the lexicon
   mutate(country="England")
 
-walesTwt_nrc <- walesTwt %>%
-  unnest_tokens(word, text) %>%
-  inner_join(get_sentiments("nrc")) %>% #join with the lexicon
-  mutate(country="Wales")
-
-walesTwt_bing <- walesTwt %>%
-  unnest_tokens(word, text) %>%
-  inner_join(get_sentiments("bing")) %>% #join with the lexicon
-  mutate(country="Wales")
-
-NITwt_nrc <- NITwt %>%
-  unnest_tokens(word, text) %>%
-  inner_join(get_sentiments("nrc")) %>% #join with the lexicon
-  mutate(country="Northern Ireland")
-
-NITwt_bing <- NITwt %>%
-  unnest_tokens(word, text) %>%
-  inner_join(get_sentiments("bing")) %>% #join with the lexicon
-  mutate(country="Northern Ireland")
-
-scotlandTwt_nrc <- scotlandTwt %>%
-  unnest_tokens(word, text) %>%
-  inner_join(get_sentiments("nrc")) %>% #join with the lexicon
-  mutate(country="Scotland")
-
-scotlandTwt_bing <- scotlandTwt %>%
-  unnest_tokens(word, text) %>%
-  inner_join(get_sentiments("bing")) %>% #join with the lexicon
-  mutate(country="Scotland")
+# walesTwt_nrc <- walesTwt %>%
+#   unnest_tokens(word, text) %>%
+#   inner_join(get_sentiments("nrc")) %>% #join with the lexicon
+#   mutate(country="Wales")
+# 
+# walesTwt_bing <- walesTwt %>%
+#   unnest_tokens(word, text) %>%
+#   inner_join(get_sentiments("bing")) %>% #join with the lexicon
+#   mutate(country="Wales")
+# 
+# NITwt_nrc <- NITwt %>%
+#   unnest_tokens(word, text) %>%
+#   inner_join(get_sentiments("nrc")) %>% #join with the lexicon
+#   mutate(country="Northern Ireland")
+# 
+# NITwt_bing <- NITwt %>%
+#   unnest_tokens(word, text) %>%
+#   inner_join(get_sentiments("bing")) %>% #join with the lexicon
+#   mutate(country="Northern Ireland")
+# 
+# scotlandTwt_nrc <- scotlandTwt %>%
+#   unnest_tokens(word, text) %>%
+#   inner_join(get_sentiments("nrc")) %>% #join with the lexicon
+#   mutate(country="Scotland")
+# 
+# scotlandTwt_bing <- scotlandTwt %>%
+#   unnest_tokens(word, text) %>%
+#   inner_join(get_sentiments("bing")) %>% #join with the lexicon
+#   mutate(country="Scotland")
 
 
 #combine all
-UK_nrc = data.frame(rbind(englandTwt_nrc, walesTwt_nrc, NITwt_nrc, scotlandTwt_nrc))
+UK_nrc = data.frame(rbind(englandTwt_nrc)) #, walesTwt_nrc, NITwt_nrc, scotlandTwt_nrc))
 
-UK_bing = data.frame(rbind(englandTwt_bing, walesTwt_bing, NITwt_bing, scotlandTwt_bing))
+UK_bing = data.frame(rbind(englandTwt_bing)) #, walesTwt_bing, NITwt_bing, scotlandTwt_bing))
 
 unique(UK_bing$sentiment) 
 head(UK_nrc)
 head(UK_bing)
 
 #Define some colors to use throughout
-my_colors <- c("#E69F00", "chartreuse4", "brown", "cadetblue")
+my_colors <- c("#E69F00") #, "chartreuse4", "brown", "cadetblue")
 
-grid.col = c("England" = my_colors[1], "Wales" = my_colors[2], "Northern Ireland" = my_colors[3], 
-             "Scotland" = my_colors[4], "positive" = "grey", 
-             "negative" = "grey")
+grid.col = c("England" = my_colors[1])#, "Wales" = my_colors[2], "Northern Ireland" = my_colors[3], 
+             #"Scotland" = my_colors[4], "positive" = "grey", 
+             #"negative" = "grey")
 
-grid.col = c("England" = my_colors[1], "Wales" = my_colors[2], "Northern Ireland" = my_colors[3], 
-             "Scotland" = my_colors[4], "positive" = "green", 
-             "negative" = "red")
+grid.col = c("England" = my_colors[1])#, "Wales" = my_colors[2], "Northern Ireland" = my_colors[3], 
+             #"Scotland" = my_colors[4], "positive" = "green", 
+             #"negative" = "red")
 
 
 UK_nrc <-  UK_nrc %>%
@@ -339,6 +329,7 @@ colors_in=c(rgb(0.255,0,0,0.1), rgb(0.255,0.69,0,0.3))
 par(mar=rep(0.8,4))
 par(mfrow=c(1,1))
 
+dev.new()
 # plot with default options:
 radarchart(UK_bing_2, axistype=1, seg=3,
     #custom polygon
