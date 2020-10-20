@@ -146,8 +146,23 @@ shp = readOGR(dsn=".", layer="Police_Force_Areas__December_2016__Boundaries",
 
 shp.sf <- st_read(system.file("shape/Police_Force_Areas__December_2016__Boundaries.shp", package="sf"))
 
-plot(shp.sf)
+#cycle_hire_osm_projected = st_transform(shp.sf, 27700)
+#plot(shp.sf)
 
+#frequency
+tab = data.frame(table(data$policeForce))
+tab <- tab %>%
+  dplyr::rename(Police.Force=Var1)
+
+
+#read population
+pop = read.table(file="population-police-force.csv", sep=",", head=TRUE)
+head(pop)
+
+pop  = left_join(pop, tab)
+
+density = pop %>%
+  mutate(density=((Freq/Mid.2010)*1000))
 
 library(RColorBrewer)
 pal <- brewer.pal(7, "OrRd") # we select 7 colors from the palette
@@ -159,13 +174,11 @@ plot(shp.sf["st_lengths"],
      pal = pal)
 
 
-
+#plot of organic tweet
+#plot of replies
+#total tweets
 
 #------------------------------------------------------
-
-
-
-
 
 avonandSomersetTwt <- data %>% dplyr::filter(policeForce=="Avon and Somerset") %>%
   dplyr::select(text) %>%
