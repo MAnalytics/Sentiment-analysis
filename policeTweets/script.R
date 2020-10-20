@@ -91,9 +91,16 @@ for(i in seq_len(length(hashtags1))){ #i<-1
     #                           token = token, lang="en",geocode= lookup_coords("london"),
     #                           apikey = 'AIzaSyCVb_NhAp0Ic_KEa8d7MF5RDuMobIeiuds')
 
+    if(!i %in% c(4,5)){
     tweets_g1 <- search_tweets(q=hashtags1[i],  n=8500, type="recent", include_rts=TRUE, 
                               token = token, lang="en",geocode='53.805,-4.242,350mi')
-    
+    }
+  
+    if(i %in% c(4,5)){
+    tweets_g1 <- search_tweets(q=hashtags1[i],  n=17500, type="recent", include_rts=TRUE, 
+                               token = token, lang="en",geocode='53.805,-4.242,350mi')
+    }
+  
     if(nrow(tweets_g1)!=0){
       tweets_g1 <- tweets_g1 %>% dplyr::mutate(class="police")
       all_Tweets <- rbind(all_Tweets, tweets_g1)  #all_Tweets<-NULL
@@ -102,10 +109,16 @@ for(i in seq_len(length(hashtags1))){ #i<-1
       #print(paste("hashtags1",i, sep="|"))
     }
     
-    
+    if(!i %in% c(4,5)){
     tweets_g2 <- search_tweets(q=hashtags2[i],  n=8500, type="recent", include_rts=TRUE, 
                                token = token, lang="en",geocode='53.805,-4.242,350mi')
-    
+    }
+  
+    if(i %in% c(4,5)){
+    tweets_g2 <- search_tweets(q=hashtags2[i],  n=17500, type="recent", include_rts=TRUE, 
+                               token = token, lang="en",geocode='53.805,-4.242,350mi')
+    }
+  
     if(nrow(tweets_g2)!=0){
       tweets_g2 <- tweets_g2 %>% dplyr::mutate(class="policing")
       all_Tweets <- rbind(all_Tweets, tweets_g2)  #all_Tweets<-NULL
@@ -118,11 +131,14 @@ for(i in seq_len(length(hashtags1))){ #i<-1
     print(paste(nrow(tweets_g1), nrow(tweets_g2), sep="||"))
     print("waiting for 15.5 minutes")
     testit(960)
-  }
-  
+}
 
 
-write_as_csv(all_Tweets, paste("policeTweet_set_", 3, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
+write_as_csv(all_Tweets, paste("policeTweet_set_", 13, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
+
+
+
+
 
 
 

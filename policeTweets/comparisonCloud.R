@@ -16,8 +16,15 @@ library(wordcloud2)
 
 
 #create the data..
-eng <- englandTwt %>%
+aas <- avonandSomersetTwt %>%
   unnest_tokens(word, text) 
+ees <- essexTwt %>%
+  unnest_tokens(word, text) 
+ham <- hampshireTwt %>%
+  unnest_tokens(word, text) 
+met <- metropolitanTwt %>%
+  unnest_tokens(word, text) 
+
 # wal <- walesTwt %>%
 #   unnest_tokens(word, text) 
 # nir <- NITwt %>%
@@ -25,7 +32,11 @@ eng <- englandTwt %>%
 # sco <- scotlandTwt %>%
 #   unnest_tokens(word, text) 
 
-eng = paste(eng, collapse=" ") 
+aas = paste(aas, collapse=" ")
+ees = paste(ees, collapse=" ")
+ham = paste(ham, collapse=" ")
+met = paste(met, collapse=" ")
+
 # wal = paste(wal, collapse=" ") 
 # nir = paste(nir, collapse=" ") 
 # sco = paste(sco, collapse=" ") 
@@ -44,14 +55,26 @@ eng = paste(eng, collapse=" ")
 
 
 x <- "a1~!@#$%^&*(){}_+:\"<>?,./;'[]-=" #or whatever
-eng <- str_replace_all(eng, "[[:punct:]]", " ")
+aas <- str_replace_all(aas, "[[:punct:]]", " ")
+ees <- str_replace_all(ees, "[[:punct:]]", " ")
+ham <- str_replace_all(ham, "[[:punct:]]", " ")
+met <- str_replace_all(met, "[[:punct:]]", " ")
+
+
 # wal <- str_replace_all(wal, "[[:punct:]]", " ")
 # nir <- str_replace_all(nir, "[[:punct:]]", " ")
 # sco <- str_replace_all(sco, "[[:punct:]]", " ")
 
 #remove
-eng = str_remove_all(eng, "[\n]")
-eng = str_remove_all(eng, "[\"]")
+aas = str_remove_all(aas, "[\n]")
+aas = str_remove_all(aas, "[\"]")
+ees = str_remove_all(ees, "[\n]")
+ees = str_remove_all(ees, "[\"]")
+ham = str_remove_all(ham, "[\n]")
+ham = str_remove_all(ham, "[\"]")
+met = str_remove_all(met, "[\n]")
+met = str_remove_all(met, "[\"]")
+
 # wal = str_remove_all(wal, "[\n]")
 # wal = str_remove_all(wal, "[\"]")
 # nir = str_remove_all(nir, "[\n]")
@@ -60,8 +83,15 @@ eng = str_remove_all(eng, "[\"]")
 # sco = str_remove_all(sco, "[\"]")
 
 #remove all 'within' number & #remove all characters starting with numbers
-eng = tmp <- gsub("\\d+", "", eng)
-eng = gsub("? [[:digit:]]*", " ", eng)
+aas = tmp <- gsub("\\d+", "", aas)
+aas = gsub("? [[:digit:]]*", " ", aas)
+ees = tmp <- gsub("\\d+", "", ees)
+ees = gsub("? [[:digit:]]*", " ", ees)
+ham = tmp <- gsub("\\d+", "", ham)
+ham = gsub("? [[:digit:]]*", " ", ham)
+met = tmp <- gsub("\\d+", "", met)
+met = gsub("? [[:digit:]]*", " ", met)
+
 # wal = tmp <- gsub("\\d+", "", wal)
 # wal = gsub("? [[:digit:]]*", " ", wal)
 # nir = tmp <- gsub("\\d+", "", nir)
@@ -73,7 +103,8 @@ eng = gsub("? [[:digit:]]*", " ", eng)
 #all = removeWords(eng,stopwords("english"))
 
 #change the order
-all = c(eng)
+#all = c(eng)
+all = c(aas,ees,ham,met)
 #all = c(sco, nir, wal, eng)
 
 # remove stop-words
@@ -102,18 +133,18 @@ tdm[1139, 3] <- 6 #nir
 cloud_tdm1 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,1])) 
 head(cloud_tdm1)
 row.names(cloud_tdm1) <- as.vector(row.names(tdm))
-# cloud_tdm2 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,2])) 
-# row.names(cloud_tdm2) <- as.vector(row.names(tdm))
-# cloud_tdm3 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,3])) 
-# row.names(cloud_tdm3) <- as.vector(row.names(tdm))
-# cloud_tdm4 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,4])) 
-# row.names(cloud_tdm4) <- as.vector(row.names(tdm))
+cloud_tdm2 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,2]))
+row.names(cloud_tdm2) <- as.vector(row.names(tdm))
+cloud_tdm3 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,3]))
+row.names(cloud_tdm3) <- as.vector(row.names(tdm))
+cloud_tdm4 <- cbind(word=as.vector(row.names(tdm)), freq1=as.numeric(tdm[,4]))
+row.names(cloud_tdm4) <- as.vector(row.names(tdm))
 
 
 write.table(cloud_tdm1, file="cloud1.csv", sep=",", row.names = F)
-# write.table(cloud_tdm2, file="cloud2.csv", sep=",", row.names = F)
-# write.table(cloud_tdm3, file="cloud3.csv", sep=",", row.names = F)
-# write.table(cloud_tdm4, file="cloud4.csv", sep=",", row.names = F)
+write.table(cloud_tdm2, file="cloud2.csv", sep=",", row.names = F)
+write.table(cloud_tdm3, file="cloud3.csv", sep=",", row.names = F)
+write.table(cloud_tdm4, file="cloud4.csv", sep=",", row.names = F)
 
 #list of words to remove
 words_to_remove <- c("the", "and", "this", "its", "and",
@@ -134,25 +165,25 @@ wordcloud(dat$word, as.numeric(dat$freq1))
 #---------------------
 
 
-# cloud_tdm2 <- read.table(file="cloud2.csv", sep=",", head = TRUE)
-# cloud_tdm2 <- cloud_tdm2[which(cloud_tdm2$word!="indyref"),]  #remove indiref
-# cloud_tdm2 <- cloud_tdm2[order(-cloud_tdm2$freq1),]
-# cloud_tdm2 <- cloud_tdm2 %>% filter(!word %in% words_to_remove)
-# cloud_tdm2 <- cloud_tdm2[1:1000,]
-# 
-# 
-# cloud_tdm3 <- read.table(file="cloud3.csv", sep=",", head = TRUE)
-# cloud_tdm3 <- cloud_tdm3[which(cloud_tdm3$word!="indyref"),]  #remove indiref
-# cloud_tdm3 <- cloud_tdm3[order(-cloud_tdm3$freq1),]
-# cloud_tdm3 <- cloud_tdm3 %>% filter(!word %in% words_to_remove)
-# cloud_tdm3 <- cloud_tdm3[1:1000,]
-# 
-# 
-# cloud_tdm4 <- read.table(file="cloud4.csv", sep=",", head = TRUE)
-# cloud_tdm4 <- cloud_tdm4[which(cloud_tdm4$word!="indyref"),]  #remove indiref
-# cloud_tdm4 <- cloud_tdm4[order(-cloud_tdm4$freq1),]
-# cloud_tdm4 <- cloud_tdm4 %>% filter(!word %in% words_to_remove)
-# cloud_tdm4 <- cloud_tdm4[1:1000,]
+cloud_tdm2 <- read.table(file="cloud2.csv", sep=",", head = TRUE)
+#cloud_tdm2 <- cloud_tdm2[which(cloud_tdm2$word!="indyref"),]  #remove indiref
+cloud_tdm2 <- cloud_tdm2[order(-cloud_tdm2$freq1),]
+cloud_tdm2 <- cloud_tdm2 %>% filter(!word %in% words_to_remove)
+cloud_tdm2 <- cloud_tdm2[1:1000,]
+
+
+cloud_tdm3 <- read.table(file="cloud3.csv", sep=",", head = TRUE)
+#cloud_tdm3 <- cloud_tdm3[which(cloud_tdm3$word!="indyref"),]  #remove indiref
+cloud_tdm3 <- cloud_tdm3[order(-cloud_tdm3$freq1),]
+cloud_tdm3 <- cloud_tdm3 %>% filter(!word %in% words_to_remove)
+cloud_tdm3 <- cloud_tdm3[1:1000,]
+
+
+cloud_tdm4 <- read.table(file="cloud4.csv", sep=",", head = TRUE)
+#cloud_tdm4 <- cloud_tdm4[which(cloud_tdm4$word!="indyref"),]  #remove indiref
+cloud_tdm4 <- cloud_tdm4[order(-cloud_tdm4$freq1),]
+cloud_tdm4 <- cloud_tdm4 %>% filter(!word %in% words_to_remove)
+cloud_tdm4 <- cloud_tdm4[1:1000,]
 
 # install.packages("devtools")
 # install.packages("wordcloud2")
@@ -172,7 +203,7 @@ wordcloud(dat$word, as.numeric(dat$freq1))
 #order {all = c(sco, nir, wal, eng)}
 #scotland
 wordcloud2(data.frame(cloud_tdm1), backgroundColor = "white", size = 1, minRotation = -pi/6, maxRotation = -pi/6, rotateRatio = 1)
-wordcloud2(data.frame(cloud_tdm1), backgroundColor = "white", size = 1)
+#wordcloud2(data.frame(cloud_tdm1), backgroundColor = "white", size = 1)
 #northern ireland
 wordcloud2(data.frame(cloud_tdm2), backgroundColor = "white", size = 1, minRotation = pi/6, maxRotation = pi/6, rotateRatio = 1)
 #Wales
@@ -181,6 +212,12 @@ wordcloud2(data.frame(cloud_tdm3), backgroundColor = "white", size = 1, minRotat
 wordcloud2(data.frame(cloud_tdm4), backgroundColor = "white", size = 1, minRotation = -pi/6, maxRotation = -pi/6, rotateRatio = 1)
 
 combined_cloud_tdm1 <- head(cloud_tdm3)
+
+
+
+cloud_tdm = rbind(cloud_tdm1, cloud_tdm2, cloud_tdm3, cloud_tdm4)
+
+
 #head(
 #England
 figPath = system.file("examples/Et.png",package = "wordcloud2")
