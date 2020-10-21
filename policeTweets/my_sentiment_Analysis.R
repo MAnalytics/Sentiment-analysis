@@ -77,22 +77,45 @@ data10 = read.table(file="./policeTweet_set_10_.csv", sep=",", head=TRUE)
 data11 = read.table(file="./policeTweet_set_11_.csv", sep=",", head=TRUE)
 data12 = read.table(file="./policeTweet_set_12_.csv", sep=",", head=TRUE)
 data13 = read.table(file="./policeTweet_set_13_.csv", sep=",", head=TRUE)
+data14 = read.table(file="./policeTweet_set_14_.csv", sep=",", head=TRUE)
+data15 = read.table(file="./policeTweet_set_15_.csv", sep=",", head=TRUE)
+
 
 
 data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11,  
-data12, data13) #, data14, data15, data16, data17, data18, data19, data20,
+data12, data13, data14, data15) #, data16, data17, data18, data19, data20,
 #data21, data22, data23, data24, data25)
 
 rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
-data11, data12, data13)#, data14, data15, data16, data17, data18, data19, data20,
+data11, data12, data13, data14, data15) #, data16, data17, data18, data19, data20,
 #data21, data22, data23, data24, data25)
 #which(duplicated(data$status_id))
 #which(duplicated(data$status_id))
 data$location6[1:15]
 head(data)
 
-#remove duplicates, replies, and retweets
-data = data %>%
+#USE ONLY ORGANIC TWEETS >>> remove duplicate
+data1 = data %>%
+  dplyr::arrange(status_id) %>%
+  dplyr::filter(!duplicated(status_id))%>%
+  dplyr::filter(is.na(reply_to_status_id))%>% #removes replies
+  dplyr::filter(is_retweet==FALSE)%>% #remove retweets
+  dplyr::mutate(location1= gsub(",.*$", "", location)) %>% #add city name
+  dplyr::select(-c(location))%>%
+  dplyr::rename(location=location1)
+
+#USE ONLY RETWEET 
+data2 = data %>%
+  dplyr::arrange(status_id) %>%
+  dplyr::filter(!duplicated(status_id))%>%
+  dplyr::filter(!is.na(reply_to_status_id))%>% #removes replies
+  dplyr::filter(is_retweet==FALSE)%>% #remove retweets
+  dplyr::mutate(location1= gsub(",.*$", "", location)) %>% #add city name
+  dplyr::select(-c(location))%>%
+  dplyr::rename(location=location1)
+
+#USE BOTH ORGANIC AND REPLIES
+data3 = data %>%
   dplyr::arrange(status_id) %>%
   dplyr::filter(!duplicated(status_id))%>%
   #dplyr::filter(is.na(reply_to_status_id))%>% #removes replies
@@ -100,31 +123,32 @@ data = data %>%
   dplyr::mutate(location1= gsub(",.*$", "", location)) %>% #add city name
   dplyr::select(-c(location))%>%
   dplyr::rename(location=location1)
-# mutate(location1 = str_remove(location, ", United Kingdom")) %>% #remove UK
-# mutate(location2 = str_remove(location1, ", UK")) %>% 
-# mutate(location3 = str_remove(location2, ", England")) %>% 
-# mutate(location4 = str_remove(location3, ", Wales")) %>% 
-# mutate(location5 = str_remove(location4, ", Northern Ireland")) %>% 
-# mutate(location6 = str_remove(location5, ", Scotland")) #%>% 
+
+
+nrow(data3)
 
 head(data)
 
-data_ <- left_join(data, location, by = "location", keep=TRUE)
-
-head(data_)
-nrow(data_)
-
-write.table(data_, file="joined_Data.csv", sep=",", row.names = F)
+data_1 <- left_join(data1, location, by = "location", keep=TRUE)
+data_2 <- left_join(data2, location, by = "location", keep=TRUE)
+data_3 <- left_join(data3, location, by = "location", keep=TRUE)
 
 
+# head(data_)
+# nrow(data_)
 # 
-# 
+# write.table(data_, file="joined_Data.csv", sep=",", row.names = F)
+
+
 # character_passages <- passages %>%
 #   regex_left_join(characters, by = c(text = "character_regex"))
 # 
 
 #transfer
-data = data_
+data = data_1
+data = data_2
+data = data_3
+
 
 library(rgdal)
 library(ggplot2)
@@ -142,9 +166,17 @@ dev.new()
 shp = readOGR(dsn=".", layer="Police_Force_Areas__December_2016__Boundaries",
                stringsAsFactors = FALSE)
 
+shp@polygons[1]
+
+
+
 #shp.sf <- st_read("Police_Force_Areas__December_2016__Boundaries.shp")
 
 shp.sf <- st_read(system.file("shape/Police_Force_Areas__December_2016__Boundaries.shp", package="sf"))
+plot(shp.sf[1])
+plot(shp.sf[1][which(shp.sf$pfa16nm=="Cleveland"),], add=TRUE, color="red")
+plot(shp.sf[1][which(shp.sf$pfa16nm=="Cleveland"),])
+
 
 #cycle_hire_osm_projected = st_transform(shp.sf, 27700)
 #plot(shp.sf)
@@ -162,17 +194,22 @@ head(pop)
 pop  = left_join(pop, tab)
 
 density = pop %>%
-  mutate(density=((Freq/Mid.2010)*1000))
+  mutate(density=((Freq/Mid.2010)*1000))%>%
+  rename(pfa16nm = Police.Force)
+
+#join map with density
+shp.sf_density <- left_join(shp.sf, density)
 
 library(RColorBrewer)
 pal <- brewer.pal(7, "OrRd") # we select 7 colors from the palette
 class(pal)
 
-plot(shp.sf["st_lengths"], 
+plot(shp.sf_density["density"], 
      main = "density", 
      breaks = "quantile", nbreaks = 7,
      pal = pal)
 
+################
 
 #plot of organic tweet
 #plot of replies
@@ -195,7 +232,7 @@ hampshireTwt <- data %>% dplyr::filter(policeForce=="Hampshire") %>%
   dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
   mutate(text=str_replace_all(text, "[[:punct:]]", " "))
 
-metropolitanTwt <- data %>% dplyr::filter(policeForce=="Metropolitan") %>%
+metropolitanTwt <- data %>% dplyr::filter(policeForce=="Metropolitan Police") %>%
   dplyr::select(text) %>%
   dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
   mutate(text=str_replace_all(text, "[[:punct:]]", " ")) 
@@ -220,7 +257,7 @@ kentTwt <- data %>% dplyr::filter(policeForce=="Kent") %>%
   dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
   mutate(text=str_replace_all(text, "[[:punct:]]", " ")) 
 
-lanchashireTwt <- data %>% dplyr::filter(policeForce=="Lanchashire") %>%
+lancashireTwt <- data %>% dplyr::filter(policeForce=="Lancashire") %>%
   dplyr::select(text) %>%
   dplyr::mutate(text = gsub("http://*|https://*|https*|\n*|*>|<*","", text)) %>%
   mutate(text=str_replace_all(text, "[[:punct:]]", " ")) 
@@ -258,7 +295,7 @@ southYorkshireTwt$text <- sapply(southYorkshireTwt,function(row) iconv(row, "lat
 westmidlandsTwt$text <- sapply(westmidlandsTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 westYorkshireTwt$text <- sapply(westYorkshireTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 kentTwt$text <- sapply(kentTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-lanchashireTwt$text <- sapply(lanchashireTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+lancashireTwt$text <- sapply(lancashireTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 merseysideTwt$text <- sapply(merseysideTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 cheshireTwt$text <- sapply(cheshireTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 greaterManchesterTwt$text <- sapply(greaterManchesterTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
@@ -299,7 +336,7 @@ southYorkshireTwt$text <- sapply(southYorkshireTwt , fix.contractions)
 westmidlandsTwt$text <- sapply(westmidlandsTwt , fix.contractions)
 westYorkshireTwt$text <- sapply(westYorkshireTwt , fix.contractions)
 kentTwt$text <- sapply(kentTwt , fix.contractions)
-lanchashireTwt$text <- sapply(lanchashireTwt , fix.contractions)
+lancashireTwt$text <- sapply(lancashireTwt , fix.contractions)
 merseysideTwt$text <- sapply(merseysideTwt , fix.contractions)
 cheshireTwt$text <- sapply(cheshireTwt , fix.contractions)
 greaterManchesterTwt$text <- sapply(greaterManchesterTwt , fix.contractions)
@@ -324,7 +361,7 @@ southYorkshireTwt$text <- sapply(southYorkshireTwt$text, removeSpecialChars)
 westmidlandsTwt$text <- sapply(westmidlandsTwt$text, removeSpecialChars)
 westYorkshireTwt$text <- sapply(westYorkshireTwt$text, removeSpecialChars)
 kentTwt$text <- sapply(kentTwt$text, removeSpecialChars)
-lanchashireTwt$text <- sapply(lanchashireTwt$text, removeSpecialChars)
+lancashireTwt$text <- sapply(lancashireTwt$text, removeSpecialChars)
 merseysideTwt$text <- sapply(merseysideTwt$text, removeSpecialChars)
 cheshireTwt$text <- sapply(cheshireTwt$text, removeSpecialChars)
 greaterManchesterTwt$text <- sapply(greaterManchesterTwt$text, removeSpecialChars)
@@ -343,7 +380,7 @@ southYorkshireTwt$text <- sapply(southYorkshireTwt$text, tolower)
 westmidlandsTwt$text <- sapply(westmidlandsTwt$text, tolower)
 westYorkshireTwt$text <- sapply(westYorkshireTwt$text, tolower)
 kentTwt$text <- sapply(kentTwt$text, tolower)
-lanchashireTwt$text <- sapply(lanchashireTwt$text, tolower)
+lancashireTwt$text <- sapply(lancashireTwt$text, tolower)
 merseysideTwt$text <- sapply(merseysideTwt$text, tolower)
 cheshireTwt$text <- sapply(cheshireTwt$text, tolower)
 greaterManchesterTwt$text <- sapply(greaterManchesterTwt$text, tolower)
@@ -370,7 +407,7 @@ southYorkshireTwt$text <- sapply(southYorkshireTwt,function(row) iconv(row, "lat
 westmidlandsTwt$text <- sapply(westmidlandsTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 westYorkshireTwt$text <- sapply(westYorkshireTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 kentTwt$text <- sapply(kentTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
-lanchashireTwt$text <- sapply(lanchashireTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
+lancashireTwt$text <- sapply(lancashireTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 merseysideTwt$text <- sapply(merseysideTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 cheshireTwt$text <- sapply(cheshireTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
 greaterManchesterTwt$text <- sapply(greaterManchesterTwt,function(row) iconv(row, "latin1", "ASCII", sub=""))
@@ -472,15 +509,15 @@ kentTwt_bing <- kentTwt %>%
   mutate(country="kent")
 
 
-lanchashireTwt_nrc <- lanchashireTwt %>%
+lancashireTwt_nrc <- lancashireTwt %>%
   unnest_tokens(word, text) %>%
   inner_join(get_sentiments("nrc")) %>% #join with the lexicon
-  mutate(country="lanchashire")
+  mutate(country="lancashire")
 
-lanchashireTwt_bing <- lanchashireTwt %>%
+lancashireTwt_bing <- lancashireTwt %>%
   unnest_tokens(word, text) %>%
   inner_join(get_sentiments("bing")) %>% #join with the lexicon
-  mutate(country="lanchashire")
+  mutate(country="lancashire")
 
 merseysideTwt_nrc <- merseysideTwt %>%
   unnest_tokens(word, text) %>%
@@ -530,13 +567,13 @@ nottinghamshireTwt_bing <- nottinghamshireTwt %>%
 #UK_nrc = data.frame(rbind(avonandSomersetTwt_nrc, essexTwt_nrc, NITwt_nrc, scotlandTwt_nrc))
 UK_nrc = data.frame(rbind(avonandSomersetTwt_nrc, essexTwt_nrc, hampshireTwt_nrc, metropolitanTwt_nrc,
                           southYorkshireTwt_nrc, westmidlandsTwt_nrc, westYorkshireTwt_nrc, 
-                          kentTwt_nrc, lanchashireTwt_nrc, merseysideTwt_nrc,
+                          kentTwt_nrc, lancashireTwt_nrc, merseysideTwt_nrc,
                           cheshireTwt_nrc, greaterManchesterTwt_nrc, nottinghamshireTwt_nrc))
 
 #UK_bing = data.frame(rbind(englandTwt_bing)) #, walesTwt_bing, NITwt_bing, scotlandTwt_bing))
 UK_bing = data.frame(rbind(avonandSomersetTwt_bing, essexTwt_bing, hampshireTwt_bing, metropolitanTwt_bing,
                            southYorkshireTwt_bing, westmidlandsTwt_bing, westYorkshireTwt_bing, 
-                           kentTwt_bing, lanchashireTwt_bing, merseysideTwt_bing,
+                           kentTwt_bing, lancashireTwt_bing, merseysideTwt_bing,
                            cheshireTwt_bing, greaterManchesterTwt_bing, nottinghamshireTwt_bing))
 
 
@@ -550,7 +587,7 @@ my_colors <- c("#E69F00", "chartreuse4", "brown", "cadetblue", "purple", "green"
 
 grid.col = c("avonandSomerset" = my_colors[1], "essex" = my_colors[2], "hampshire" = my_colors[3], 
              "metropolitan" = my_colors[4], "southYorkshire" = my_colors[5], "westmidlands" = my_colors[6],
-             "westYorkshire" = my_colors[7], "kent" = my_colors[8], "lanchashire" = my_colors[9], "merseyside" = my_colors[10],
+             "westYorkshire" = my_colors[7], "kent" = my_colors[8], "lancashire" = my_colors[9], "merseyside" = my_colors[10],
              "cheshire" = my_colors[11], "greaterManchester" = my_colors[12], "nottinghamshire" = my_colors[13],
              "positive" = "grey", 
              "negative" = "grey")
@@ -642,7 +679,7 @@ UK_bing_2 = UK_bing_ %>% select(-sentiment)
 max_min = rbind(rep(75, 13), rep(0, 13))
 colnames(max_min) = c("avonandSomerset", "essex", "hampshire", "metropolitan",
                       "southYorkshire", "westmidlands", "westYorkshire", 
-                      "kent", "lanchashire", "merseyside",
+                      "kent", "lancashire", "merseyside",
                       "cheshire", "greaterManchester", "nottinghamshire")
 UK_bing_2 = rbind(max_min,UK_bing_2)
 row.names(UK_bing_2)<- c("1", "2", "negative","positive")
@@ -679,7 +716,7 @@ head(UK_nrc_2)
 #sort as: 
 reference = c("avonandSomerset", "essex", "hampshire", "metropolitan", 
               "southYorkshire", "westmidlands", "westYorkshire","kent", 
-              "lanchashire", "merseyside", "cheshire", "greaterManchester", "nottinghamshire")
+              "lancashire", "merseyside", "cheshire", "greaterManchester", "nottinghamshire")
 UK_nrc_2 <- UK_nrc_2[match(reference, UK_nrc_2$Country),]
 
 UK_nrc_2
@@ -738,7 +775,7 @@ for(i in 1:13){ #i=2
 
 UK_bingPN = data.frame(rbind(avonandSomersetTwt_bing, essexTwt_bing, hampshireTwt_bing, metropolitanTwt_bing,
                            southYorkshireTwt_bing, westmidlandsTwt_bing, westYorkshireTwt_bing, 
-                           kentTwt_bing, lanchashireTwt_bing, merseysideTwt_bing,
+                           kentTwt_bing, lancashireTwt_bing, merseysideTwt_bing,
                            cheshireTwt_bing, greaterManchesterTwt_bing, nottinghamshireTwt_bing))
 
 place = unique(UK_bingPN$country)
