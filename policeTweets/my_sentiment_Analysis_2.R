@@ -20,7 +20,10 @@ dat_ = dat %>%
   #filter(Force.Name == "Avon and Somerset")
   dplyr::group_by(Force.Name)%>%
   summarise_at(vars(num),
-               list(name=sum))
+               list(name=sum)) %>%
+  rename(Police.Force=Force.Name)%>%
+  rename(Crime.Count=name)
+  
 data.frame(dat_[order(-dat_$name),])
 
 ###library(widyr) #Use for pairwise correlation
@@ -45,6 +48,13 @@ require(tm)
 require(wordcloud)
 library(textdata)
 library(tidyr)
+library(rgdal)
+library(ggplot2)
+library(dplyr)
+library(maptools)
+library(sf)
+library(reshape2)
+library(scales)
 
 #library(wordcloud2) #creative visualizations
 #reference: https://www.datacamp.com/community/tutorials/sentiment-analysis-R
@@ -79,15 +89,16 @@ data12 = read.table(file="./policeTweet_set_12_.csv", sep=",", head=TRUE)
 data13 = read.table(file="./policeTweet_set_13_.csv", sep=",", head=TRUE)
 data14 = read.table(file="./policeTweet_set_14_.csv", sep=",", head=TRUE)
 data15 = read.table(file="./policeTweet_set_15_.csv", sep=",", head=TRUE)
+data16 = read.table(file="./policeTweet_set_16_.csv", sep=",", head=TRUE)
 
 
 
 data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11,  
-             data12, data13, data14, data15) #, data16, data17, data18, data19, data20,
+             data12, data13, data14, data15, data16) #, data17, data18, data19, data20,
 #data21, data22, data23, data24, data25)
 
 rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
-   data11, data12, data13, data14, data15) #, data16, data17, data18, data19, data20,
+   data11, data12, data13, data14, data15, data16) #, data17, data18, data19, data20,
 #data21, data22, data23, data24, data25)
 #which(duplicated(data$status_id))
 #which(duplicated(data$status_id))
@@ -147,14 +158,11 @@ data_3 <- left_join(data3, location, by = "location", keep=TRUE)
 #transfer
 data = data_1
 data = data_2
+
 data = data_3
+nrow(data)
 
 
-library(rgdal)
-library(ggplot2)
-library(dplyr)
-library(maptools)
-library(sf)
 # install.packages('rgeos', type='source')
 # install.packages('rgdal', type='source')
 #------------------------------------------------------
@@ -249,6 +257,8 @@ fix.contractions <- function(doc) {
 #function to remove special xters
 removeSpecialChars <- function(x) gsub("[^a-zA-Z0-9 ]", " ", x)
 
+
+#--------------------------------
 for(i in 1:length(Pf_names_regions_uni)){ #i=1
 #clean tweets
 placeTwt <- data %>% dplyr::filter(policeForce==Pf_names_regions_uni[i]) %>%
@@ -285,69 +295,62 @@ placeTwt_bing <- placeTwt %>%
 flush.console()
 print(i)
 
-write.table(placeTwt, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], ".csv", sep=""),
+write.table(placeTwt_nrc, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_nrc", ".csv", sep=""),
             sep=",", row.names = F)
+
+write.table(placeTwt_bing, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_bing", ".csv", sep=""),
+            sep=",", row.names = F)
+
 
 }
 
 
 
-#----------------------------------------------------------------
-#produce plots by regions
+#----------------------------------------------------------------------
+#Emotion chart
+#----------------------------------------------------------------------
 
-Pf_regions_uni <- unique(Pf_names_regions$Regions)
+dev.new()
+par(mar=rep(0.8,4))
+par(mfrow=c(3,3))
+
+#Pf_regions_uni <- unique(Pf_names_regions$Regions)
+
+Pf_regions_uni <- c("North West", "North East","Yorkshire and the Humber",
+                    "West Midlands","East Midlands","Eastern",
+                    "Wales", "South West","South East")
+
+bing_sent_Combn <- NULL
+
 
 for(i in 1:length(Pf_regions_uni)){ #i=1
   
-  .
-  .
-  .
-  .
+    subsetP <- Pf_names_regions %>% 
+      filter(Regions == Pf_regions_uni[i])
   
-dat_ <- read.table(file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_regions_uni[i], ".csv", sep=""), sep=",", )
+    dat2 <- NULL
+    
+    for(j in 1:nrow(subsetP)) {#j=1
+      dat2 <- rbind(dat2, 
+                    read.table(file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", subsetP$Police.Force[j],"_bing", ".csv", sep=""), sep=",", head=TRUE))
+    }
+#}
 
-region_dat_ <- NULL
+spike_words <- c("pandemic", "police", "policing",
+                 "lockdown",
+                 "corona",
+                 "coronavirus",
+                 "covid",
+                 "covid-19",
+                 "virus")
 
 #combine all
-#UK_nrc = data.frame(rbind(avonandSomersetTwt_nrc, essexTwt_nrc, NITwt_nrc, scotlandTwt_nrc))
-UK_nrc = data.frame(rbind(avonandSomersetTwt_nrc, essexTwt_nrc, hampshireTwt_nrc, metropolitanTwt_nrc,
-                          southYorkshireTwt_nrc, westmidlandsTwt_nrc, westYorkshireTwt_nrc, 
-                          kentTwt_nrc, lancashireTwt_nrc, merseysideTwt_nrc,
-                          cheshireTwt_nrc, greaterManchesterTwt_nrc, nottinghamshireTwt_nrc))
-
-#UK_bing = data.frame(rbind(englandTwt_bing)) #, walesTwt_bing, NITwt_bing, scotlandTwt_bing))
-UK_bing = data.frame(rbind(avonandSomersetTwt_bing, essexTwt_bing, hampshireTwt_bing, metropolitanTwt_bing,
-                           southYorkshireTwt_bing, westmidlandsTwt_bing, westYorkshireTwt_bing, 
-                           kentTwt_bing, lancashireTwt_bing, merseysideTwt_bing,
-                           cheshireTwt_bing, greaterManchesterTwt_bing, nottinghamshireTwt_bing))
-
+UK_bing = data.frame(dat2[which(!dat2$word %in% spike_words),])
+dat2$word
+UK_bing$word
 
 unique(UK_bing$sentiment) 
-head(UK_nrc)
 head(UK_bing)
-
-#Define some colors to use throughout
-my_colors <- c("#E69F00", "chartreuse4", "brown", "cadetblue", "purple", "green", 
-               "orange", "grey", "magenta", "pink", "purple", "magenta", "orange")
-
-grid.col = c("avonandSomerset" = my_colors[1], "essex" = my_colors[2], "hampshire" = my_colors[3], 
-             "metropolitan" = my_colors[4], "southYorkshire" = my_colors[5], "westmidlands" = my_colors[6],
-             "westYorkshire" = my_colors[7], "kent" = my_colors[8], "lancashire" = my_colors[9], "merseyside" = my_colors[10],
-             "cheshire" = my_colors[11], "greaterManchester" = my_colors[12], "nottinghamshire" = my_colors[13],
-             "positive" = "grey", 
-             "negative" = "grey")
-
-#grid.col = c("England" = my_colors[1])#, "Wales" = my_colors[2], "Northern Ireland" = my_colors[3], 
-#"Scotland" = my_colors[4], "positive" = "green", 
-#"negative" = "red")
-
-
-UK_nrc <-  UK_nrc %>%
-  filter(country != "NA" & !sentiment %in% c("positive", "negative")) %>%
-  count(sentiment, country) %>%
-  group_by(country, sentiment) %>%
-  summarise(sentiment_sum = sum(n)) %>%
-  ungroup()
 
 UK_bing <-  UK_bing %>%
   count(sentiment, country) %>%
@@ -355,44 +358,7 @@ UK_bing <-  UK_bing %>%
   summarise(sentiment_sum = sum(n)) %>%
   ungroup()
 
-library(circlize)
-circos.clear()
-
-#----------------------------------nrc
-#Set the gap size
-circos.par(gap.after = c(rep(5, length(unique(UK_nrc[[1]])) - 1), 15,
-                         rep(5, length(unique(UK_nrc[[2]])) - 1), 15))
-chordDiagram(UK_nrc, grid.col = grid.col, transparency = .2,annotationTrackHeight = c(0.06, 0.06))
-title("Sentiment analysis")
-
-
-par(mfrow = c(1, 1))
-circos.par(start.degree = -3)
-chordDiagram(UK_bing, grid.col = grid.col, big.gap = 20,annotationTrackHeight = c(0.06, 0.06))
-abline(h = 0, lty = 2, col = "#00000080")
-circos.clear()
-
-#---------------------------------bing
-#circos.par(gap.after = c(rep(5, length(unique(UK_bing[[1]])) - 1), 15,
-#rep(5, length(unique(UK_bing[[2]])) - 1), 15))
-#chordDiagram(UK_bing, grid.col = grid.col, transparency = .2, annotationTrackHeight = c(0.06, 0.06))
-#title("Sentiment analysis")
-
-circos.clear()
-
-par(mfrow = c(1, 1))
-circos.par(start.degree = 0)
-chordDiagram(UK_nrc, grid.col = grid.col, big.gap = 20,annotationTrackHeight = c(0.06, 0.06))
-abline(h = 0, lty = 2, col = "#00000080")
-circos.clear()
-
-
-circos.track(track.index = 1, panel.fun = function(x, y) {
-  circos.text(CELL_META$xcenter, CELL_META$ylim[1], CELL_META$sector.index, 
-              facing = "clockwise", niceFacing = TRUE, adj = c(0, 1))
-}, bg.border = NA) 
-
-
+bing_sent_Combn <- rbind(bing_sent_Combn, UK_bing)
 #---------------------------------------------------------------------
 #---------------------------------------------------------------------
 
@@ -401,31 +367,23 @@ UK_bing_ = UK_bing %>%
   dplyr::mutate(total=sum(sentiment_sum))%>%
   mutate(pct=round((sentiment_sum/total)*100, digits=2))
 
-UK_nrc_ = UK_nrc %>% 
-  group_by(country) %>%
-  dplyr::mutate(total=sum(sentiment_sum))%>%
-  mutate(pct=round((sentiment_sum/total)*100, digits=2))
-
 UK_bing_ = data.frame(dcast(UK_bing_, sentiment ~ country))
-UK_nrc_ = data.frame(dcast(UK_nrc_, sentiment ~ country))
 
-write.table(UK_bing_, file="UK_bing_.csv", sep=",", row.names=F)
-write.table(UK_nrc_, file="UK_nrc_.csv", sep=",", row.names=F)
+#write.table(UK_bing_, file="UK_bing_.csv", sep=",", row.names=F)
+#write.table(UK_nrc_, file="UK_nrc_.csv", sep=",", row.names=F)
 
 #----------------------------------------------------------------------
 #Polarity chart
 #---------------------------------------------------------------------
-par(mar=rep(0.8,4))
-par(mfrow=c(1,1))
+# dev.new()
+# par(mar=rep(0.8,4))
+# par(mfrow=c(3,3))
 
 # Create data: note in High school for Jonathan:
 UK_bing_2 = UK_bing_ %>% select(-sentiment) 
 #sort as: 
-max_min = rbind(rep(75, 13), rep(0, 13))
-colnames(max_min) = c("avonandSomerset", "essex", "hampshire", "metropolitan",
-                      "southYorkshire", "westmidlands", "westYorkshire", 
-                      "kent", "lancashire", "merseyside",
-                      "cheshire", "greaterManchester", "nottinghamshire")
+max_min = rbind(rep(75, ncol(UK_bing_2)), rep(0, ncol(UK_bing_2)))
+colnames(max_min) = colnames(UK_bing_2)
 UK_bing_2 = rbind(max_min,UK_bing_2)
 row.names(UK_bing_2)<- c("1", "2", "negative","positive")
 
@@ -433,13 +391,17 @@ row.names(UK_bing_2)<- c("1", "2", "negative","positive")
 #https://www.rapidtables.com/web/color/RGB_Color.html
 # Color vector
 
-colors_border=c("#FF0000", rgb(0.255,0.69,0,0.9))
-colors_in=c(rgb(0.255,0,0,0.1), rgb(0.255,0.69,0,0.3))
+# colors_border=c("#FF0000", rgb(0.255,0.69,0,0.9))
+# colors_in=c(rgb(0.255,0,0,0.1), rgb(0.255,0.69,0,0.3))
+alpha("red", 0.1)
+# Set graphic colors
+coul <- c("red", "forestgreen")
+colors_border <- coul
+#library(scales)
+colors_in <- alpha(coul,0.1)
+colors_in2 <- alpha(coul,0.9)
 
-par(mar=rep(0.8,4))
-par(mfrow=c(1,1))
 
-dev.new()
 # plot with default options:
 radarchart(UK_bing_2, axistype=1, seg=3,
            #custom polygon
@@ -449,139 +411,235 @@ radarchart(UK_bing_2, axistype=1, seg=3,
            cglcol="grey", cglty=2, axislabcol="grey", caxislabels=seq(0,75,25), cglwd=0.1,
            #custom labels
            vlcex=1.2,
+           title=Pf_regions_uni[i]
 )
+#mtext(side = 0, line = 12, at = 0, cex = 1, Pf_regions_uni[i], font = 2)
+legend(x=0.7, y=1.3, legend = rownames(UK_bing_2[-c(1,2),]), 
+       bty = "n", pch=20 , col=colors_in2[1:2], text.col = "black", cex=1.2, pt.cex=3)
+
+
+}
 
 
 #----------------------------------------------------------------------
 #Emotion chart
 #----------------------------------------------------------------------
-# Create data: note in High school for Jonathan:
+
+
+dev.new()
+par(mar=rep(0.8,4))
+par(mfrow=c(3,3))
+
+Pf_regions_uni <- unique(Pf_names_regions$Regions)
+
+Pf_regions_uni <- c("North West", "North East","Yorkshire and the Humber",
+                    "West Midlands","East Midlands","Eastern",
+                    "Wales", "South West","South East")
+
+nrc_sent_Combn <- NULL
+
+for(i in 1:length(Pf_regions_uni)){ #i=1
+  
+  subsetP <- Pf_names_regions %>% 
+    filter(Regions == Pf_regions_uni[i])
+  
+  dat2 <- NULL
+  
+  for(j in 1:nrow(subsetP)) {#j=1
+    dat2 <- rbind(dat2, 
+                  read.table(file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", subsetP$Police.Force[j],"_nrc", ".csv", sep=""), sep=",", head=TRUE))
+    
+    # dat3 <- rbind(dat3, 
+    #               read.table(file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", subsetP$Police.Force[j],"_bing", ".csv", sep=""), sep=",", head=TRUE))
+  }
+  #}
+  
+  spike_words <- c("pandemic", "police", "policing",
+                   "lockdown",
+                   "corona",
+                   "coronavirus",
+                   "covid",
+                   "covid-19",
+                   "virus")
+  
+  #combine all
+  UK_nrc = data.frame(dat2[which(!dat2$word %in% spike_words),])
+  
+  dat2$word
+  UK_nrc$word
+  
+  unique(UK_nrc$sentiment) 
+  head(UK_nrc)
+  
+  #Define some colors to use throughout
+  # my_colors <- c("#E69F00", "chartreuse4", "brown", "cadetblue", "purple", "green", 
+  #                "orange", "grey", "magenta", "pink", "purple", "magenta", "orange")
+  
+  grid.col = c(grid_,
+               "positive" = "grey", 
+               "negative" = "grey")
+  
+  UK_nrc <-  UK_nrc %>%
+    filter(country != "NA" & !sentiment %in% c("positive", "negative")) %>%
+    count(sentiment, country) %>%
+    group_by(country, sentiment) %>%
+    summarise(sentiment_sum = sum(n)) %>%
+    ungroup()
+  
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
+  
+  UK_nrc_ = UK_nrc %>% 
+    group_by(country) %>%
+    dplyr::mutate(total=sum(sentiment_sum))%>%
+    mutate(pct=round((sentiment_sum/total)*100, digits=2))
+  
+  UK_nrc_ = data.frame(dcast(UK_nrc_, sentiment ~ country))
+  
+  #keep
+  if(i==1){
+    nrc_sent_Combn = UK_nrc_
+  }
+  if(i!=1){
+    nrc_sent_Combn <- cbind(nrc_sent_Combn, UK_nrc_[,2:ncol(UK_nrc_)])
+  }
+  #write.table(UK_bing_, file="UK_bing_.csv", sep=",", row.names=F)
+  #write.table(UK_nrc_, file="UK_nrc_.csv", sep=",", row.names=F)
+  
+  #----------------------------------------------------------------------
+  #Polarity chart
+  #---------------------------------------------------------------------
+  # dev.new()
+  # par(mar=rep(0.8,4))
+  # par(mfrow=c(3,3))
+  
+# Set graphic colors
+library(RColorBrewer)
+coul <- brewer.pal(length(reference), "Dark2")
+colors_border <- coul
+library(scales)
+colors_in <- alpha(coul,0.1)
+colors_in2 <- alpha(coul,0.5)
+
+
 UK_nrc_2 = UK_nrc_ %>% gather(Country, valname, -sentiment) %>% spread(sentiment, valname)
 head(UK_nrc_2)
 #sort as: 
-reference = c("avonandSomerset", "essex", "hampshire", "metropolitan", 
-              "southYorkshire", "westmidlands", "westYorkshire","kent", 
-              "lancashire", "merseyside", "cheshire", "greaterManchester", "nottinghamshire")
+
+reference = UK_nrc_2$Country
 UK_nrc_2 <- UK_nrc_2[match(reference, UK_nrc_2$Country),]
 
 UK_nrc_2
-mytitle <- as.character(unlist((UK_nrc_2 %>% select(Country))))
+#mytitle <- as.character(unlist((UK_nrc_2 %>% select(Country))))
 UK_nrc_2 = UK_nrc_2 %>% select(-Country)
-max_min = rbind(rep(24, 8), rep(0, 8))
+max_min = rbind(rep(24,8), rep(0, 8))
 colnames(max_min)<- c("anger","anticipation","disgust","fear","joy","sadness","surprise","trust")
-row.names(max_min) <- 1:nrow(max_min)
+row.names(UK_nrc_2) <- reference
 UK_nrc_2 = rbind(max_min,UK_nrc_2)
-row.names(UK_nrc_2) <- 1:nrow(UK_nrc_2)
+#row.names(UK_nrc_2) <- 1:nrow(UK_nrc_2)
+
+# par(mar=rep(0.3,4))
+# par(mfrow=c(1,1))
 
 # Prepare color
-colors_border=c(adjustcolor("#00BFFF", alpha.f = 1), adjustcolor("#FF8C00", alpha.f = 1), 
-                adjustcolor("green", alpha.f = 1), adjustcolor("#FFD700", alpha.f = 1),
-                adjustcolor("violetred1", alpha.f = 1),adjustcolor("wheat4", alpha.f = 1),
-                adjustcolor("slateblue", alpha.f = 1),adjustcolor("slategray4", alpha.f = 1),
-                adjustcolor("slateblue", alpha.f = 1),adjustcolor("slategray4", alpha.f = 1),
-                adjustcolor("slateblue", alpha.f = 1),adjustcolor("slategray4", alpha.f = 1),
-                adjustcolor("slateblue", alpha.f = 1))
-
-colors_in=c(adjustcolor("#00BFFF", alpha.f = 0.2), adjustcolor("#FF8C00", alpha.f = 0.2), 
-            adjustcolor("green", alpha.f = 0.2), adjustcolor("#FFD700", alpha.f = 0.2),
-            adjustcolor("violetred1", alpha.f = 0.2),adjustcolor("wheat4", alpha.f = 0.2),
-            adjustcolor("slateblue", alpha.f = 0.2),adjustcolor("slategray4", alpha.f = 0.2),
-            adjustcolor("slateblue", alpha.f = 0.2),adjustcolor("slategray4", alpha.f = 0.2),
-            adjustcolor("slateblue", alpha.f = 0.2),adjustcolor("slategray4", alpha.f = 0.2),
-            adjustcolor("slateblue", alpha.f = 0.2))
-
-
+##colors_border= rep(adjustcolor("#00BFFF", alpha.f = 1), length(reference))
+##colors_in= rep(adjustcolor("#00BFFF", alpha.f = 0.2), length(reference))
+# plot with default options:
+radarchart(UK_nrc_2, axistype=1, seg=3,
+           pcol=colors_border, pfcol=colors_in, plwd=3, plty=1, 
+           #custom the grid
+           cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,24,8), cglwd=0.8,
+           #custom labels
+           vlcex=0.8,
+           title=Pf_regions_uni[i])
+legend(x=1.0, y=1, legend = rownames(UK_nrc_2[-c(1,2),]), 
+       bty = "n", pch=20 , col=colors_in2, text.col = "black", cex=1.2, pt.cex=3)
 #colors_border=colormap(colormap=colormaps$viridis, nshades=4, alpha=1)
 #colors_in=colormap(colormap=colormaps$viridis, nshades=4, alpha=0.3)
 
 # Split the screen in 6 parts
-par(mar=rep(0.8,4))
-par(mfrow=c(4,4))
 
-# Loop for each plot
-for(i in 1:13){ #i=2
-  # Custom the radarChart !
-  radarchart(UK_nrc_2[c(1,2,i+2),], axistype=1, seg=3,
-             #custom polygon
-             pcol=colors_border[i] , pfcol=colors_in[i] , plwd=4, plty=1 , 
-             #custom the grid
-             cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,24,8), cglwd=0.8,
-             #custom labels
-             vlcex=0.8,
-             #title
-             title=mytitle[i]
-  )
 }
 
+nrc_sent_Combn <- nrc_sent_Combn[,2:ncol(nrc_sent_Combn)]
+
+nrc_sent_Combn2 <- t(nrc_sent_Combn)
+
+c("Cheshire", "Cumbria", "Greater Manchester", "Lancashire", "Merseyside",
+  "Cleveland", "Durham", "Northumbria",
+  "Humberside","North Yorkshire", "South.Yorkshire", "West.Yorkshire",
+  "")
+#---------------------------------------------------------------
+#Sentiment (positive vs. negative)
 #----------------------------------------------------------------
 
 #Is the difference between police forces significant (t.test)
 #https://www.kaggle.com/rtatman/tutorial-sentiment-analysis-in-r
 
-UK_bingPN = data.frame(rbind(avonandSomersetTwt_bing, essexTwt_bing, hampshireTwt_bing, metropolitanTwt_bing,
-                             southYorkshireTwt_bing, westmidlandsTwt_bing, westYorkshireTwt_bing, 
-                             kentTwt_bing, lancashireTwt_bing, merseysideTwt_bing,
-                             cheshireTwt_bing, greaterManchesterTwt_bing, nottinghamshireTwt_bing))
+UK_bingPN = data.frame(bing_sent_Combn)
+
+#UK_bingPN <- UK_bing
+
 
 place = unique(UK_bingPN$country)
 
 sentimentPLACE = NULL
 
 for(i in 1:length(place)){ #i=1
-  
-  if(i %in% c(1:6)){
+
     UK_bingPN1 <- UK_bingPN %>%
       filter(country == place[i])%>%
-      count(sentiment)%>%
-      spread(sentiment, n, fill = 0)%>% # made data wide rather than narrow
+      #count(sentiment)%>%
+      spread(sentiment, sentiment_sum, fill = 0)%>% # made data wide rather than narrow
       mutate(sentiment = positive - negative) %>%
-      mutate(force = place[i]) %>%
-      mutate(category="H")
-  }
-  
-  if(i %in% c(7:13)){ 
-    UK_bingPN1 <- UK_bingPN %>%
-      filter(country == place[i])%>%
-      count(sentiment)%>%
-      spread(sentiment, n, fill = 0)%>% # made data wide rather than narrow
-      mutate(sentiment = positive - negative) %>%
-      mutate(force = place[i])%>%
-      mutate(category="L")
-  }
-  
+      mutate(force = place[i]) #%>%
+      #mutate(category="H")
+    
   sentimentPLACE <- rbind(sentimentPLACE, UK_bingPN1)  
 }
 
 
-sentimentPLACE
-
-#subset by region
-#subset by quartile..crime volume
-
-#is the difference between parties significant?
-# get democratic presidents & add party affiliation
-democrats <- sentimentPLACE %>%
-  filter(category == c("H")) 
+sentimentPLACE <- sentimentPLACE %>%
+  dplyr::select(-c(force))%>%
+  dplyr::rename(Police.Force=country)
 
 
-# get democratic presidents & party add affiliation
-republicans <- sentimentPLACE %>%
-  filter(category == "L")
+#import predictor variables.
 
+predict <- read.table(file="predictors.csv", sep=",", head=TRUE)
 
-# join both
-byParty <- full_join(democrats, republicans)
+head(predict)
 
-# the difference between the parties is significant
-t.test(democrats$sentiment, republicans$sentiment)
+#join
 
-# plot sentiment by party
-ggplot(byParty, aes(x = category, y = sentiment, color = category)) + geom_boxplot() + geom_point()
-
-
-
-
+lm_dat = left_join(sentimentPLACE, predict)
+lm_dat = left_join(lm_dat, dat_)
+colnames(lm_dat)
+model = lm(data=lm_dat, sentiment ~ Local.Policing + Dealing.with.the.Public + Criminal.Justice.Arrangements +
+     Road.Policing+Operational.Support + Intelligence + Investigations + Public.Protection + Investigative.Support + 
+     National.Policing + Support.Functions + Others)
 #-----------------------------------------------------------------
+summary(model)
+#-----------------------------------------------------------------
+
+
+#using emotional attributes
+lm_dat2 = UK_nrc_2[3:nrow(UK_nrc_2), ]
+lm_dat2 = data.frame(cbind(row.names(lm_dat2), lm_dat2))
+row.names(lm_dat2) = 1:nrow(lm_dat2)
+
+lm_dat2 = lm_dat2 %>%
+  rename(Police.Force=row.names.lm_dat2.)
+
+#join data
+lm_dat_nrc <- left_join(lm_dat2, predict)
+
+
+
+
+
+
+
 
 
 #plot the police force area
@@ -591,7 +649,38 @@ plot(shp)
 
 shp@data
 
-#----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #https://cran.r-project.org/web/packages/SentimentAnalysis/vignettes/SentimentAnalysis.html
 # the best
@@ -677,25 +766,25 @@ popular_words %>%
   coord_flip()
 
 
-Descriptive Statistics
-If you haven't read Part One, you may need to take a quick look at 
-a few summary graphs of the full dataset. You'll do this using 
-creative graphs from the ggplot2, circlize, and yarrr packages.
-
-Shipshape: Word Count Per Song
-A pirate would say shipshape when everything is in good order, tidy and clean. 
-So here is an interesting view of the clean and tidy data showing the lexical diversity, 
-or, in other words, vocabulary, of the lyrics over time. A pirate plot is an advanced 
-method of plotting a continuous dependent variable, such as the word count, 
-as a function of a categorical independent variable, like decade. 
-This combines raw data points, descriptive and inferential statistics into a single effective plot. 
-Check out this great blog for more details about pirateplot() from the yarrr package.
-
-Create the word_summary data frame that calculates the distinct word 
-count per song. The more diverse the lyrics, the larger the vocabulary. 
-Thinking about the data in this way gets you ready for word level analysis. 
-Reset the decade field to contain the value "NONE" for songs without a release 
-date and relabel those fields with cleaner labels using select().
+# Descriptive Statistics
+# If you haven't read Part One, you may need to take a quick look at 
+# a few summary graphs of the full dataset. You'll do this using 
+# creative graphs from the ggplot2, circlize, and yarrr packages.
+# 
+# Shipshape: Word Count Per Song
+# A pirate would say shipshape when everything is in good order, tidy and clean. 
+# So here is an interesting view of the clean and tidy data showing the lexical diversity, 
+# or, in other words, vocabulary, of the lyrics over time. A pirate plot is an advanced 
+# method of plotting a continuous dependent variable, such as the word count, 
+# as a function of a categorical independent variable, like decade. 
+# This combines raw data points, descriptive and inferential statistics into a single effective plot. 
+# Check out this great blog for more details about pirateplot() from the yarrr package.
+# 
+# Create the word_summary data frame that calculates the distinct word 
+# count per song. The more diverse the lyrics, the larger the vocabulary. 
+# Thinking about the data in this way gets you ready for word level analysis. 
+# Reset the decade field to contain the value "NONE" for songs without a release 
+# date and relabel those fields with cleaner labels using select().
 
 
 word_summary <- prince_tidy %>%

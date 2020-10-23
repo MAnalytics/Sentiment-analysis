@@ -79,15 +79,16 @@ data12 = read.table(file="./policeTweet_set_12_.csv", sep=",", head=TRUE)
 data13 = read.table(file="./policeTweet_set_13_.csv", sep=",", head=TRUE)
 data14 = read.table(file="./policeTweet_set_14_.csv", sep=",", head=TRUE)
 data15 = read.table(file="./policeTweet_set_15_.csv", sep=",", head=TRUE)
+data16 = read.table(file="./policeTweet_set_16_.csv", sep=",", head=TRUE)
 
 
 
 data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11,  
-data12, data13, data14, data15) #, data16, data17, data18, data19, data20,
+data12, data13, data14, data15, data16) #, data17, data18, data19, data20,
 #data21, data22, data23, data24, data25)
 
 rm(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, 
-data11, data12, data13, data14, data15) #, data16, data17, data18, data19, data20,
+data11, data12, data13, data14, data15, data16) #, data17, data18, data19, data20,
 #data21, data22, data23, data24, data25)
 #which(duplicated(data$status_id))
 #which(duplicated(data$status_id))
@@ -147,14 +148,10 @@ data_3 <- left_join(data3, location, by = "location", keep=TRUE)
 #transfer
 data = data_1
 data = data_2
+
 data = data_3
 
 
-library(rgdal)
-library(ggplot2)
-library(dplyr)
-library(maptools)
-library(sf)
 # install.packages('rgeos', type='source')
 # install.packages('rgdal', type='source')
 #------------------------------------------------------
@@ -162,7 +159,7 @@ library(sf)
 #https://medium.com/@anjesh/step-by-step-choropleth-map-in-r-a-case-of-mapping-nepal-7f62a84078d9
 #https://cengel.github.io/R-spatial/mapping.html  #for color manipulation
 ##plot the police force area
-dev.new()
+#dev.new()
 shp = readOGR(dsn=".", layer="Police_Force_Areas__December_2016__Boundaries",
                stringsAsFactors = FALSE)
 
