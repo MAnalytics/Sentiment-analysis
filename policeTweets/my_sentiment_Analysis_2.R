@@ -6,6 +6,9 @@ library(fmsb)
 library(tidyr)
 library(radarchart)
 library(grDevices)
+library(htmlwidgets)
+library(plotly)
+library(webshot)
 
 
 #get names of police station
@@ -292,13 +295,22 @@ placeTwt_bing <- placeTwt %>%
   inner_join(get_sentiments("bing")) %>% #join with the lexicon
   mutate(country=Pf_names_regions_uni[i])
 
+placeTwt_afinn <- placeTwt %>%
+  unnest_tokens(word, text) %>%
+  inner_join(get_sentiments("afinn")) %>% #join with the lexicon
+  mutate(country=Pf_names_regions_uni[i])
+
+
 flush.console()
 print(i)
 
-write.table(placeTwt_nrc, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_nrc", ".csv", sep=""),
-            sep=",", row.names = F)
+#write.table(placeTwt_nrc, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_nrc", ".csv", sep=""),
+#            sep=",", row.names = F)
 
-write.table(placeTwt_bing, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_bing", ".csv", sep=""),
+#write.table(placeTwt_bing, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_bing", ".csv", sep=""),
+#            sep=",", row.names = F)
+
+write.table(placeTwt_afinn, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_afinn", ".csv", sep=""),
             sep=",", row.names = F)
 
 
@@ -307,7 +319,7 @@ write.table(placeTwt_bing, file = paste("C:/Users/55131065/Desktop/downloadTweet
 
 
 #----------------------------------------------------------------------
-#Emotion chart
+#Polarity chart
 #----------------------------------------------------------------------
 
 dev.new()
@@ -421,6 +433,119 @@ legend(x=0.7, y=1.3, legend = rownames(UK_bing_2[-c(1,2),]),
 }
 
 
+
+
+#----------------------------------------------------------------------
+#Afinn chart
+#----------------------------------------------------------------------
+
+dev.new()
+par(mar=rep(0.8,4))
+par(mfrow=c(3,3))
+
+#Pf_regions_uni <- unique(Pf_names_regions$Regions)
+
+Pf_regions_uni <- c("North West", "North East","Yorkshire and the Humber",
+                    "West Midlands","East Midlands","Eastern",
+                    "Wales", "South West","South East")
+
+afinn_sent_Combn <- NULL
+
+
+for(i in 1:length(Pf_regions_uni)){ #i=1
+  
+  subsetP <- Pf_names_regions %>% 
+    filter(Regions == Pf_regions_uni[i])
+  
+  dat2 <- NULL
+  
+  for(j in 1:nrow(subsetP)) {#j=1
+    dat2 <- rbind(dat2, 
+                  read.table(file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", subsetP$Police.Force[j],"_afinn", ".csv", sep=""), sep=",", head=TRUE))
+  }
+  #}
+  
+  spike_words <- c("pandemic", "police", "policing",
+                   "lockdown",
+                   "corona",
+                   "coronavirus",
+                   "covid",
+                   "covid-19",
+                   "virus")
+  
+  #combine all
+  UK_afinn = data.frame(dat2[which(!dat2$word %in% spike_words),])
+  dat2$word
+  UK_afinn$word
+  
+  unique(UK_afinn$sentiment) 
+  head(UK_afinn)
+  
+  UK_afinn <-  UK_afinn %>%
+    count(sentiment, country) %>%
+    group_by(country, sentiment) %>%
+    summarise(sentiment_sum = sum(n)) %>%
+    ungroup()
+  
+  afinn_sent_Combn <- rbind(afinn_sent_Combn, UK_afinn)
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
+  
+  UK_afinn_ = UK_afinn %>% 
+    group_by(country) %>%
+    dplyr::mutate(total=sum(sentiment_sum))%>%
+    mutate(pct=round((sentiment_sum/total)*100, digits=2))
+  
+  UK_afinn_ = data.frame(dcast(UK_afinn_, sentiment ~ country))
+  
+  # dev.new()
+  # par(mar=rep(0.8,4))
+  # par(mfrow=c(3,3))
+  
+  # Create data: note in High school for Jonathan:
+  UK_afinn_2 = UK_afinn_ %>% select(-sentiment) 
+  #sort as: 
+  max_min = rbind(rep(75, ncol(UK_afinn_2)), rep(0, ncol(UK_afinn_2)))
+  colnames(max_min) = colnames(UK_afinn_2)
+  UK_afinn_2 = rbind(max_min,UK_afinn_2)
+  row.names(UK_afinn_2)<- c("1", "2", "negative","positive")
+  
+  #colors
+  #https://www.rapidtables.com/web/color/RGB_Color.html
+  # Color vector
+  
+  # colors_border=c("#FF0000", rgb(0.255,0.69,0,0.9))
+  # colors_in=c(rgb(0.255,0,0,0.1), rgb(0.255,0.69,0,0.3))
+  alpha("red", 0.1)
+  # Set graphic colors
+  coul <- c("red", "forestgreen")
+  colors_border <- coul
+  #library(scales)
+  colors_in <- alpha(coul,0.1)
+  colors_in2 <- alpha(coul,0.9)
+  
+  
+  # plot with default options:
+  radarchart(UK_afinn_2, axistype=1, seg=3,
+             #custom polygon
+             pcol=colors_border[1:2],
+             pfcol=colors_in[1:2], plwd=4, plty=5,pch=3, 
+             #custom the grid
+             cglcol="grey", cglty=2, axislabcol="grey", caxislabels=seq(0,75,25), cglwd=0.1,
+             #custom labels
+             vlcex=1.2,
+             title=Pf_regions_uni[i]
+  )
+  #mtext(side = 0, line = 12, at = 0, cex = 1, Pf_regions_uni[i], font = 2)
+  legend(x=0.7, y=1.3, legend = rownames(UK_afinn_2[-c(1,2),]), 
+         bty = "n", pch=20 , col=colors_in2[1:2], text.col = "black", cex=1.2, pt.cex=3)
+  
+  
+}
+
+
+
+
 #----------------------------------------------------------------------
 #Emotion chart
 #----------------------------------------------------------------------
@@ -496,6 +621,8 @@ for(i in 1:length(Pf_regions_uni)){ #i=1
   
   UK_nrc_ = data.frame(dcast(UK_nrc_, sentiment ~ country))
   
+  #sum(UK_nrc_[,7])
+  
   #keep
   if(i==1){
     nrc_sent_Combn = UK_nrc_
@@ -545,30 +672,154 @@ UK_nrc_2 = rbind(max_min,UK_nrc_2)
 ##colors_border= rep(adjustcolor("#00BFFF", alpha.f = 1), length(reference))
 ##colors_in= rep(adjustcolor("#00BFFF", alpha.f = 0.2), length(reference))
 # plot with default options:
-radarchart(UK_nrc_2, axistype=1, seg=3,
-           pcol=colors_border, pfcol=colors_in, plwd=3, plty=1, 
-           #custom the grid
-           cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,24,8), cglwd=0.8,
-           #custom labels
-           vlcex=0.8,
-           title=Pf_regions_uni[i])
-legend(x=1.0, y=1, legend = rownames(UK_nrc_2[-c(1,2),]), 
-       bty = "n", pch=20 , col=colors_in2, text.col = "black", cex=1.2, pt.cex=3)
+# radarchart(UK_nrc_2, axistype=1, seg=3,
+#            pcol=colors_border, pfcol=colors_in, plwd=3, plty=1, 
+#            #custom the grid
+#            cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,24,8), cglwd=0.8,
+#            #custom labels
+#            vlcex=0.8,
+#            title=Pf_regions_uni[i])
+# legend(x=1.0, y=1, legend = rownames(UK_nrc_2[-c(1,2),]), 
+#        bty = "n", pch=20 , col=colors_in2, text.col = "black", cex=1.2, pt.cex=3)
 #colors_border=colormap(colormap=colormaps$viridis, nshades=4, alpha=1)
 #colors_in=colormap(colormap=colormaps$viridis, nshades=4, alpha=0.3)
 
+
+#Join the two and create a percent field
+# year_radar_chart <- year_sentiment_nrc %>%
+#   inner_join(total_sentiment_year, by = "year") %>%
+#   mutate(percent = sentiment_year_count / year_total * 100 ) %>%
+#   filter(year %in% c("1978","1994","1995")) %>%
+#   select(-sentiment_year_count, -year_total) %>%
+#   spread(year, percent) %>%
+
+# options(viewer = NULL)
+# options()
+#if(i==1){
+chart = UK_nrc_2 %>%  
+  mutate(location=row.names(UK_nrc_2)) %>%
+  mutate(anger1=anger, anticipation1=anticipation,
+         disgust1=disgust, fear1=fear,joy1=joy, sadness1=sadness,
+         surprise1=surprise,trust1=trust)%>%
+  select(-c(anger, anticipation, disgust, fear, joy, sadness,surprise,trust))%>%
+  filter(!location%in%c(1,2))%>%
+  radarchart::chartJSRadar(showToolTipLabel = TRUE, showLegend = FALSE,labelSize = 14,
+                           width = "450", height = "300",
+                           polyAlpha = 0.1, lineAlpha = 0.8,
+                           main = Pf_regions_uni[i])
+#}
+
+
+saveWidget(
+  chart,
+  file=paste("C:/Users/55131065/Desktop/downloadTweets/outputs/",Pf_regions_uni[i], "_emotions.html",sep=""),
+  selfcontained = TRUE,
+  libdir = NULL,
+  background = "white",
+ # title = class(widget)[[1]],
+  knitrOptions = list()
+)
+
+#saveWidget(x, "temp.html")
+webshot(paste("C:/Users/55131065/Desktop/downloadTweets/outputs/",Pf_regions_uni[i], "_emotions.html",sep=""),
+        paste("C:/Users/55131065/Desktop/downloadTweets/outputs/",Pf_regions_uni[i], "_emotions.png",sep=""), vwidth = 441, vheight = 351)
+
+#htmlwidgets::saveWidget(p, file=file.html", selfcontained = TRUE)
+# save
+# save(chart, file = "mygridplot.tiff")
+# 
+# ggsave(plot = chart,
+#          filename = paste(Pf_regions_uni[i],"sentiment_maps.png", sep="_"),
+#        height = 16, width = 30, unit = "cm", device = "png")
+# chart
+
+#https://stackoverflow.com/questions/52851396/create-a-pie-chart-with-chartjs-package-in-r
+#https://stackoverflow.com/questions/57569198/chart-js-radar-chart-legend-label-font-size-doesnt-work
+# library(chartjs)
+# chartjs(height = "500px") %>% 
+#   cjsPie(labels = mtcars[1:6,]) %>%
+#   cjsSeries(data = c(1:6))
 # Split the screen in 6 parts
 
 }
 
+
+
+names <- nrc_sent_Combn$sentiment
 nrc_sent_Combn <- nrc_sent_Combn[,2:ncol(nrc_sent_Combn)]
 
 nrc_sent_Combn2 <- t(nrc_sent_Combn)
 
-c("Cheshire", "Cumbria", "Greater Manchester", "Lancashire", "Merseyside",
+Police.Force = c("Cheshire", "Cumbria", "Greater Manchester", "Lancashire", "Merseyside",
   "Cleveland", "Durham", "Northumbria",
-  "Humberside","North Yorkshire", "South.Yorkshire", "West.Yorkshire",
-  "")
+  "Humberside","North Yorkshire", "South Yorkshire", "West Yorkshire",
+  "Staffordshire", "Warwickshire", "West Mercia", "West Midlands",
+  "Derbyshire", "Leicestershire","Lincolnshire","Northamptonshire","Nottinghamshire",
+  "Bedfordshire", "Cambridgeshire","Essex","Hertfordshire","Norfolk","Suffolk",
+  "Dyfed Powys", "Gwent", "North Wales", "South Wales",
+  "Avon and Somerset", "Devon and Cornwall", "Dorset","Gloucestershire","Wiltshire",
+  "Hampshire","Kent","Metropolitan Police", "Surrey","Sussex","Thames Valley")
+
+nrc_sent_Combn2 <- data.frame(cbind(nrc_sent_Combn2, Police.Force))
+row.names(nrc_sent_Combn2)<- 1:nrow(nrc_sent_Combn2)
+colnames(nrc_sent_Combn2) <- c(names, "Police.Force")
+
+lm_dat_nrc <- left_join(nrc_sent_Combn2, predict)
+head(lm_dat_nrc)
+
+model = lm(data=lm_dat_nrc, trust ~ Local.Policing + Dealing.with.the.Public + Criminal.Justice.Arrangements +
+             Road.Policing+Operational.Support + Intelligence + Investigations + Public.Protection + Investigative.Support + 
+             National.Policing + Support.Functions + Others)
+
+summary(model)
+
+
+
+
+#----------------------------------------------------------------
+#Sentiment with Bigrams (word pairs)
+#----------------------------------------------------------------
+
+#So how do bigrams affect sentiment? This time use 
+#the AFINN lexicon to perform sentiment analysis on word pairs, 
+#looking at how often sentiment-associated words are preceded 
+#by "not" or other negating words.
+
+#https://www.datacamp.com/community/tutorials/sentiment-analysis-R
+
+
+
+
+
+#Negation bigram network.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Explantory modellg
 #---------------------------------------------------------------
 #Sentiment (positive vs. negative)
 #----------------------------------------------------------------
@@ -606,20 +857,80 @@ sentimentPLACE <- sentimentPLACE %>%
 
 #import predictor variables.
 
-predict <- read.table(file="predictors.csv", sep=",", head=TRUE)
-
+#predict <- read.table(file="predictors.csv", sep=",", head=TRUE)
+predict <- read.table(file="predictors2.csv", sep=",", head=TRUE)
+#funding <- read.table(file="funding19_20.csv", sep=",", head=TRUE)
 head(predict)
 
 #join
 
 lm_dat = left_join(sentimentPLACE, predict)
-lm_dat = left_join(lm_dat, dat_)
+#lm_dat = left_join(lm_dat, dat_)
+#lm_dat = left_join(lm_dat, funding)
 colnames(lm_dat)
+head(lm_dat)#
+#lm_dat$sentiment
+
+#get data
+lm_dat_ = lm_dat %>%
+  dplyr::select(-c(Police.Force, positive, negative))
+
+#function to remove column with any NA value
+# not_any_na <- function(x) all(!is.na(x))
+# corr=data.frame(cor(lm_dat_)) #dim(corr))
+# #not_na = corr %>% select_if(not_any_na)
+
+#https://www.r-bloggers.com/2017/12/how-to-apply-linear-regression-in-r/
+#Explore the response variable
+#Let's check for the distribution of response variable 'medv'. 
+#The following figure shows the three distributions of 'medv' original, 
+#log transformation and square root transformation. 
+#We can see that both 'log' and 'sqrt' does a decent job to transform 'medv' 
+#distribution closer to normal. In the following model, I have selected 'log'
+#transformation but it is also possible to try out 'sqrt' transformation.
+##Explore the data.
+ggplot(lm_dat, aes(sentiment)) + geom_density(fill="blue")
+ggplot(lm_dat, aes(log(sentiment))) + geom_density(fill="blue")
+ggplot(lm_dat, aes(sqrt(sentiment))) + geom_density(fill="blue")
+
+ lm_dat_ <- lm_dat_ %>%
+#   dplyr::select(-c(positive, negative, Crime.Count, Police.Force))%>%
+   dplyr::filter(sentiment!=-1356)#
+#   #remove outlier
+#   #mutate(sentiment2 = sentiment + abs(min(sentiment)))#%>%
+#   #dplyr::select(-c(sentiment))
+# 
+# #2865     1509
+# #Model Building - Model 1
+# #Now as a first step we will fit the multiple regression models. 
+# #We will start by taking all input variables in the multiple regression.
+# 
+# ggplot(lm_dat_, aes(sentiment)) + geom_density(fill="blue")
+# #ggplot(lm_dat_, aes(log(sentiment))) + geom_density(fill="blue")
+# #ggplot(lm_dat_, aes(sqrt(sentiment2))) + geom_density(fill="blue")
+# 
+model1 = lm(sentiment~., data=lm_dat_)
+summary(model1)
+par(mfrow=c(2,2))
+plot(model1)
+
+lm_dat$sentiment
+
+sqrt(sentiment)
+
+lm_dat2 <- lm_dat %>%
+  filter(sentiment!=-1356)
+
+cor(lm_dat[,2:ncol(lm_dat)])
+
 model = lm(data=lm_dat, sentiment ~ Local.Policing + Dealing.with.the.Public + Criminal.Justice.Arrangements +
-     Road.Policing+Operational.Support + Intelligence + Investigations + Public.Protection + Investigative.Support + 
-     National.Policing + Support.Functions + Others)
+     Road.Policing+Operational.Support + Intelligence + Investigations + Public.Protection + Investigative.Support +
+     National.Policing + Support.Functions + Others ) #+ Funding)
 #-----------------------------------------------------------------
 summary(model)
+par(mfrow=c(2,2))
+plot(model)
+
 #-----------------------------------------------------------------
 
 
@@ -657,7 +968,10 @@ shp@data
 
 
 
-
+#Police and policing in the era of pandemic: A visual exploration of public sentiment using Twitter data
+#Word Cloud by regions..
+#word preceeding police..
+#multiple linear regression..
 
 
 
@@ -807,11 +1121,6 @@ pirateplot(formula =  word_count ~ Released + Charted, #Formula
            point.cex = 1.5, #Point size
            jitter.val = .1, #Turn on jitter to see the songs better
            cex.lab = .9, cex.names = .7) #Axis label size
-
-
-
-
-
 
 
 
