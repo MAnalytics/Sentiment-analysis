@@ -301,6 +301,12 @@ placeTwt_afinn <- placeTwt %>%
   mutate(country=Pf_names_regions_uni[i])
 
 
+#export raw data.
+write.table(placeTwt, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_raw", ".csv", sep=""),
+           sep=",", row.names = F)
+
+
+
 flush.console()
 print(i)
 
@@ -310,16 +316,27 @@ print(i)
 #write.table(placeTwt_bing, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_bing", ".csv", sep=""),
 #            sep=",", row.names = F)
 
-write.table(placeTwt_afinn, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_afinn", ".csv", sep=""),
-            sep=",", row.names = F)
+#write.table(placeTwt_afinn, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_afinn", ".csv", sep=""),
+#            sep=",", row.names = F)
 
 
 }
 
 
 
+prince_bigrams <- prince_data %>%
+  unnest_tokens(bigram, lyrics, token = "ngrams", n = 2)
+
+bigrams_separated <- prince_bigrams %>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+
+
+
+
+
+
 #----------------------------------------------------------------------
-#Polarity chart
+#Polarity chart (corrected for negations)
 #----------------------------------------------------------------------
 
 dev.new()
@@ -341,12 +358,58 @@ for(i in 1:length(Pf_regions_uni)){ #i=1
       filter(Regions == Pf_regions_uni[i])
   
     dat2 <- NULL
+    raw <- NULL
     
     for(j in 1:nrow(subsetP)) {#j=1
       dat2 <- rbind(dat2, 
                     read.table(file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", subsetP$Police.Force[j],"_bing", ".csv", sep=""), sep=",", head=TRUE))
-    }
+   
+     raw <- rbind(raw, 
+                    cbind(read.table(file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", subsetP$Police.Force[j],"_raw", ".csv", sep=""), sep=",", head=TRUE),
+                    Police.Force=subsetP$Police.Force[j]))
+     # raw <- raw %>%
+     #   mutate(Police.Force=subsetP$Police.Force[j])
+      }
+      }
 #}
+head(raw)
+summary(raw)
+
+#get not positive of aaa
+AFINN <- get_sentiments("bing")
+
+#collate word negation 
+raw_bigrams <- raw %>%
+  group_by(Police.Force)%>%
+  unnest_tokens(bigram, text, token = "ngrams", n = 2)
+
+bigrams_separated <- raw_bigrams %>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+
+not_words <- bigrams_separated %>%
+  filter(word1 %in% c("not", "no", "without", "never")) %>%
+  inner_join(AFINN, by = c(word2 = "word")) %>%
+  group_by(Police.Force)%>%
+  count(word2, sentiment, sort = TRUE) %>%
+  ungroup() %>%
+  dplyr::group_by(sentiment, Police.Force)%>%
+  summarise(sum(n)) #remember, the negative will be positive and vice versa because of the negation word.
+
+#change positive to negative and vice versa
+not_words <- not_words %>%
+  mutate(sentiment2=if_else(sentiment=="negative","positive1",
+                 if_else(sentiment=="positive", "negative1","1")))%>%
+  mutate(sentiment=if_else(sentiment2=="positive1","positive",
+                 if_else(sentiment2=="negative1", "negative","1")))%>%
+  dplyr::select(-c(sentiment2))
+
+.
+.
+.
+
+
+
+
 
 spike_words <- c("pandemic", "police", "policing",
                  "lockdown",
@@ -369,6 +432,15 @@ UK_bing <-  UK_bing %>%
   group_by(country, sentiment) %>%
   summarise(sentiment_sum = sum(n)) %>%
   ungroup()
+
+#add the "not" onces
+not_words
+
+
+
+.
+.
+
 
 bing_sent_Combn <- rbind(bing_sent_Combn, UK_bing)
 #---------------------------------------------------------------------
@@ -418,19 +490,186 @@ colors_in2 <- alpha(coul,0.9)
 radarchart(UK_bing_2, axistype=1, seg=3,
            #custom polygon
            pcol=colors_border[1:2],
-           pfcol=colors_in[1:2], plwd=4, plty=5,pch=3, 
+           pfcol=colors_in[1:2], plwd=2, plty=5,pch=3, 
            #custom the grid
            cglcol="grey", cglty=2, axislabcol="grey", caxislabels=seq(0,75,25), cglwd=0.1,
            #custom labels
            vlcex=1.2,
            title=Pf_regions_uni[i]
+           
+
 )
 #mtext(side = 0, line = 12, at = 0, cex = 1, Pf_regions_uni[i], font = 2)
-legend(x=0.7, y=1.3, legend = rownames(UK_bing_2[-c(1,2),]), 
-       bty = "n", pch=20 , col=colors_in2[1:2], text.col = "black", cex=1.2, pt.cex=3)
+#legend(x=0.7, y=1.3, legend = rownames(UK_bing_2[-c(1,2),]), 
+#       bty = "n", pch=20 , col=colors_in2[1:2], text.col = "black", cex=1.2, pt.cex=3)
 
 
 }
+
+
+
+
+#----------------------------------------------------------------------
+#Emotion chart (corrected for negations)  ..often just look at words in isolation)
+#----------------------------------------------------------------------
+
+
+dev.new()
+#jpeg('sentiment_rplot2.png')
+par(mar=rep(0.8,4))
+par(mfrow=c(3,3))
+
+Pf_regions_uni <- unique(Pf_names_regions$Regions)
+
+Pf_regions_uni <- c("North West", "North East","Yorkshire and the Humber",
+                    "West Midlands","East Midlands","Eastern",
+                    "Wales", "South West","South East")
+
+nrc_sent_Combn <- NULL
+
+for(i in 1:length(Pf_regions_uni)){ #i=2
+  
+  subsetP <- Pf_names_regions %>% 
+    filter(Regions == Pf_regions_uni[i])
+  
+  dat2 <- NULL
+  
+  for(j in 1:nrow(subsetP)) {#j=1
+    dat2 <- rbind(dat2, 
+                  read.table(file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", subsetP$Police.Force[j],"_nrc", ".csv", sep=""), sep=",", head=TRUE))
+    
+    # dat3 <- rbind(dat3, 
+    #               read.table(file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", subsetP$Police.Force[j],"_bing", ".csv", sep=""), sep=",", head=TRUE))
+  }
+  #}
+  
+  spike_words <- c("pandemic", "police", "policing",
+                   "lockdown",
+                   "corona",
+                   "coronavirus",
+                   "covid",
+                   "covid-19",
+                   "virus")
+  
+  #combine all
+  UK_nrc = data.frame(dat2[which(!dat2$word %in% spike_words),])
+  
+  dat2$word
+  UK_nrc$word
+  
+  unique(UK_nrc$sentiment) 
+  head(UK_nrc)
+  
+  #Define some colors to use throughout
+  # my_colors <- c("#E69F00", "chartreuse4", "brown", "cadetblue", "purple", "green", 
+  #                "orange", "grey", "magenta", "pink", "purple", "magenta", "orange")
+  
+  grid.col = c(grid_,
+               "positive" = "grey", 
+               "negative" = "grey")
+  
+  UK_nrc <-  UK_nrc %>%
+    filter(country != "NA" & !sentiment %in% c("positive", "negative")) %>%
+    count(sentiment, country) %>%
+    group_by(country, sentiment) %>%
+    summarise(sentiment_sum = sum(n)) %>%
+    ungroup()
+  
+  #---------------------------------------------------------------------
+  #---------------------------------------------------------------------
+  
+  UK_nrc_ = UK_nrc %>% 
+    group_by(country) %>%
+    dplyr::mutate(total=sum(sentiment_sum))%>%
+    mutate(pct=round((sentiment_sum/total)*100, digits=2))
+  
+  UK_nrc_ = data.frame(dcast(UK_nrc_, sentiment ~ country))
+  
+  #sum(UK_nrc_[,7])
+  
+  #keep
+  if(i==1){
+    nrc_sent_Combn = UK_nrc_
+  }
+  if(i!=1){
+    nrc_sent_Combn <- cbind(nrc_sent_Combn, UK_nrc_[,2:ncol(UK_nrc_)])
+  }
+  #write.table(UK_bing_, file="UK_bing_.csv", sep=",", row.names=F)
+  #write.table(UK_nrc_, file="UK_nrc_.csv", sep=",", row.names=F)
+  
+  #----------------------------------------------------------------------
+  #Polarity chart
+  #---------------------------------------------------------------------
+  # dev.new()
+  # par(mar=rep(0.8,4))
+  # par(mfrow=c(3,3))
+  
+# Set graphic colors
+
+
+
+UK_nrc_2 = UK_nrc_ %>% gather(Country, valname, -sentiment) %>% spread(sentiment, valname)
+head(UK_nrc_2)
+#sort as: 
+
+# reference = UK_nrc_2$Country
+# UK_nrc_2 <- UK_nrc_2[match(reference, UK_nrc_2$Country),]
+# 
+# UK_nrc_2
+# #mytitle <- as.character(unlist((UK_nrc_2 %>% select(Country))))
+# UK_nrc_2 = UK_nrc_2 %>% select(-Country)
+# max_min = rbind(rep(24,8), rep(0, 8))
+# colnames(max_min)<- c("anger","anticipation","disgust","fear","joy","sadness","surprise","trust")
+# row.names(UK_nrc_2) <- reference
+# UK_nrc_2 = rbind(max_min,UK_nrc_2)
+
+
+sentimentN <- colnames(UK_nrc_2)[2:length(UK_nrc_2)]
+reference = UK_nrc_2$Country
+UK_nrc_2 <- UK_nrc_2[match(reference, UK_nrc_2$Country),]
+
+UK_nrc_2
+#mytitle <- as.character(unlist((UK_nrc_2 %>% select(Country))))
+#add_rownames(UK_nrc_2, var = UK_nrc_2$Country)
+
+UK_nrc_2 = UK_nrc_2 %>% select(-Country)#%>%
+
+UK_nrc_2 <- t(UK_nrc_2)
+
+colnames(UK_nrc_2) <- reference
+max_min = rbind(rep(24,length(reference)), rep(0, length(reference)))
+
+colnames(max_min)<- reference
+row.names(max_min) <- 1:2
+UK_nrc_2 = data.frame(rbind(max_min,UK_nrc_2))
+
+#row.names(UK_nrc_2) <- 1:nrow(UK_nrc_2)
+
+library(RColorBrewer)
+coul <- brewer.pal(length(sentimentN), "Set1")
+colors_border <- coul
+library(scales)
+colors_in <- alpha(coul,0.1)
+colors_in2 <- alpha(coul,0.5)
+# par(mar=rep(0.3,4))
+# par(mfrow=c(1,1))
+
+# Prepare color
+#colors_border= rep(adjustcolor("#00BFFF", alpha.f = 1), length(sentimentN))
+#colors_in= rep(adjustcolor("#00BFFF", alpha.f = 0.2), length(sentimentN))
+# plot with default options:
+radarchart(UK_nrc_2, axistype=1, seg=3,
+           pcol=colors_border, pfcol=colors_in, plwd=2, plty=1,
+           #custom the grid
+           cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,24,8), cglwd=0.8,
+           #custom labels
+           vlcex=0.8,
+           title=Pf_regions_uni[i])
+
+
+}
+
+#dev.copy(png,'myplot.png')
 
 
 
@@ -536,212 +775,105 @@ for(i in 1:length(Pf_regions_uni)){ #i=1
              vlcex=1.2,
              title=Pf_regions_uni[i]
   )
+  
+  
   #mtext(side = 0, line = 12, at = 0, cex = 1, Pf_regions_uni[i], font = 2)
-  legend(x=0.7, y=1.3, legend = rownames(UK_afinn_2[-c(1,2),]), 
-         bty = "n", pch=20 , col=colors_in2[1:2], text.col = "black", cex=1.2, pt.cex=3)
+  #  legend(x=0.7, y=1.3, legend = rownames(UK_afinn_2[-c(1,2),]), 
+  #         bty = "n", pch=20 , col=colors_in2[1:2], text.col = "black", cex=1.2, pt.cex=3)
   
   
 }
 
 
+#-----------------------------------------------
+#Bigram for force area
+#-----------------------------------------------
+prince_bigrams <- prince_data %>%
+  unnest_tokens(bigram, lyrics, token = "ngrams", n = 2)
+
+bigrams_separated <- prince_bigrams %>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+
+bigrams_filtered <- bigrams_separated %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+  filter(!word1 %in% undesirable_words) %>%
+  filter(!word2 %in% undesirable_words)
+
+#Because there is so much repetition in music, also filter out the cases where the two words are the same
+bigram_decade <- bigrams_filtered %>%
+  filter(word1 != word2) %>%
+  filter(decade != "NA") %>%
+  unite(bigram, word1, word2, sep = " ") %>%
+  inner_join(prince_data) %>%
+  count(bigram, decade, sort = TRUE) %>%
+  group_by(decade) %>%
+  slice(seq_len(7)) %>%
+  ungroup() %>%
+  arrange(decade, n) %>%
+  mutate(row = row_number())
+
+#Because there is so much repetition in music, also filter out the cases where the two words are the same
+bigram_decade <- bigrams_filtered %>%
+  filter(word1 != word2) %>%
+  filter(decade != "NA") %>%
+  unite(bigram, word1, word2, sep = " ") %>%
+  inner_join(prince_data) %>%
+  count(bigram, decade, sort = TRUE) %>%
+  group_by(decade) %>%
+  slice(seq_len(7)) %>%
+  ungroup() %>%
+  arrange(decade, n) %>%
+  mutate(row = row_number())
+
+bigram_decade %>%
+  ggplot(aes(row, n, fill = decade)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~decade, scales = "free_y") +
+  xlab(NULL) + ylab(NULL) +
+  scale_x_continuous(  # This handles replacement of row
+    breaks = bigram_decade$row, # Notice need to reuse data frame
+    labels = bigram_decade$bigram) +
+  theme_lyrics() +
+  theme(panel.grid.major.x = element_blank()) +
+  ggtitle("Bigrams Per Decade") +
+  coord_flip()
 
 
-#----------------------------------------------------------------------
-#Emotion chart
-#----------------------------------------------------------------------
+#-----------------------------------------------
+#Polar sentiment of words preceding the word "police"
+#-----------------------------------------------
 
 
-dev.new()
-par(mar=rep(0.8,4))
-par(mfrow=c(3,3))
-
-Pf_regions_uni <- unique(Pf_names_regions$Regions)
-
-Pf_regions_uni <- c("North West", "North East","Yorkshire and the Humber",
-                    "West Midlands","East Midlands","Eastern",
-                    "Wales", "South West","South East")
-
-nrc_sent_Combn <- NULL
-
-for(i in 1:length(Pf_regions_uni)){ #i=1
-  
-  subsetP <- Pf_names_regions %>% 
-    filter(Regions == Pf_regions_uni[i])
-  
-  dat2 <- NULL
-  
-  for(j in 1:nrow(subsetP)) {#j=1
-    dat2 <- rbind(dat2, 
-                  read.table(file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", subsetP$Police.Force[j],"_nrc", ".csv", sep=""), sep=",", head=TRUE))
-    
-    # dat3 <- rbind(dat3, 
-    #               read.table(file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", subsetP$Police.Force[j],"_bing", ".csv", sep=""), sep=",", head=TRUE))
-  }
-  #}
-  
-  spike_words <- c("pandemic", "police", "policing",
-                   "lockdown",
-                   "corona",
-                   "coronavirus",
-                   "covid",
-                   "covid-19",
-                   "virus")
-  
-  #combine all
-  UK_nrc = data.frame(dat2[which(!dat2$word %in% spike_words),])
-  
-  dat2$word
-  UK_nrc$word
-  
-  unique(UK_nrc$sentiment) 
-  head(UK_nrc)
-  
-  #Define some colors to use throughout
-  # my_colors <- c("#E69F00", "chartreuse4", "brown", "cadetblue", "purple", "green", 
-  #                "orange", "grey", "magenta", "pink", "purple", "magenta", "orange")
-  
-  grid.col = c(grid_,
-               "positive" = "grey", 
-               "negative" = "grey")
-  
-  UK_nrc <-  UK_nrc %>%
-    filter(country != "NA" & !sentiment %in% c("positive", "negative")) %>%
-    count(sentiment, country) %>%
-    group_by(country, sentiment) %>%
-    summarise(sentiment_sum = sum(n)) %>%
-    ungroup()
-  
-  #---------------------------------------------------------------------
-  #---------------------------------------------------------------------
-  
-  UK_nrc_ = UK_nrc %>% 
-    group_by(country) %>%
-    dplyr::mutate(total=sum(sentiment_sum))%>%
-    mutate(pct=round((sentiment_sum/total)*100, digits=2))
-  
-  UK_nrc_ = data.frame(dcast(UK_nrc_, sentiment ~ country))
-  
-  #sum(UK_nrc_[,7])
-  
-  #keep
-  if(i==1){
-    nrc_sent_Combn = UK_nrc_
-  }
-  if(i!=1){
-    nrc_sent_Combn <- cbind(nrc_sent_Combn, UK_nrc_[,2:ncol(UK_nrc_)])
-  }
-  #write.table(UK_bing_, file="UK_bing_.csv", sep=",", row.names=F)
-  #write.table(UK_nrc_, file="UK_nrc_.csv", sep=",", row.names=F)
-  
-  #----------------------------------------------------------------------
-  #Polarity chart
-  #---------------------------------------------------------------------
-  # dev.new()
-  # par(mar=rep(0.8,4))
-  # par(mfrow=c(3,3))
-  
-# Set graphic colors
-library(RColorBrewer)
-coul <- brewer.pal(length(reference), "Dark2")
-colors_border <- coul
-library(scales)
-colors_in <- alpha(coul,0.1)
-colors_in2 <- alpha(coul,0.5)
 
 
-UK_nrc_2 = UK_nrc_ %>% gather(Country, valname, -sentiment) %>% spread(sentiment, valname)
-head(UK_nrc_2)
-#sort as: 
-
-reference = UK_nrc_2$Country
-UK_nrc_2 <- UK_nrc_2[match(reference, UK_nrc_2$Country),]
-
-UK_nrc_2
-#mytitle <- as.character(unlist((UK_nrc_2 %>% select(Country))))
-UK_nrc_2 = UK_nrc_2 %>% select(-Country)
-max_min = rbind(rep(24,8), rep(0, 8))
-colnames(max_min)<- c("anger","anticipation","disgust","fear","joy","sadness","surprise","trust")
-row.names(UK_nrc_2) <- reference
-UK_nrc_2 = rbind(max_min,UK_nrc_2)
-#row.names(UK_nrc_2) <- 1:nrow(UK_nrc_2)
-
-# par(mar=rep(0.3,4))
-# par(mfrow=c(1,1))
-
-# Prepare color
-##colors_border= rep(adjustcolor("#00BFFF", alpha.f = 1), length(reference))
-##colors_in= rep(adjustcolor("#00BFFF", alpha.f = 0.2), length(reference))
-# plot with default options:
-# radarchart(UK_nrc_2, axistype=1, seg=3,
-#            pcol=colors_border, pfcol=colors_in, plwd=3, plty=1, 
-#            #custom the grid
-#            cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,24,8), cglwd=0.8,
-#            #custom labels
-#            vlcex=0.8,
-#            title=Pf_regions_uni[i])
-# legend(x=1.0, y=1, legend = rownames(UK_nrc_2[-c(1,2),]), 
-#        bty = "n", pch=20 , col=colors_in2, text.col = "black", cex=1.2, pt.cex=3)
-#colors_border=colormap(colormap=colormaps$viridis, nshades=4, alpha=1)
-#colors_in=colormap(colormap=colormaps$viridis, nshades=4, alpha=0.3)
+#-----------------------------------------------
+#Police-Pandemic Bigram Network
+#-----------------------------------------------
 
 
-#Join the two and create a percent field
-# year_radar_chart <- year_sentiment_nrc %>%
-#   inner_join(total_sentiment_year, by = "year") %>%
-#   mutate(percent = sentiment_year_count / year_total * 100 ) %>%
-#   filter(year %in% c("1978","1994","1995")) %>%
-#   select(-sentiment_year_count, -year_total) %>%
-#   spread(year, percent) %>%
-
-# options(viewer = NULL)
-# options()
-#if(i==1){
-chart = UK_nrc_2 %>%  
-  mutate(location=row.names(UK_nrc_2)) %>%
-  mutate(anger1=anger, anticipation1=anticipation,
-         disgust1=disgust, fear1=fear,joy1=joy, sadness1=sadness,
-         surprise1=surprise,trust1=trust)%>%
-  select(-c(anger, anticipation, disgust, fear, joy, sadness,surprise,trust))%>%
-  filter(!location%in%c(1,2))%>%
-  radarchart::chartJSRadar(showToolTipLabel = TRUE, showLegend = FALSE,labelSize = 14,
-                           width = "450", height = "300",
-                           polyAlpha = 0.1, lineAlpha = 0.8,
-                           main = Pf_regions_uni[i])
-#}
 
 
-saveWidget(
-  chart,
-  file=paste("C:/Users/55131065/Desktop/downloadTweets/outputs/",Pf_regions_uni[i], "_emotions.html",sep=""),
-  selfcontained = TRUE,
-  libdir = NULL,
-  background = "white",
- # title = class(widget)[[1]],
-  knitrOptions = list()
-)
 
-#saveWidget(x, "temp.html")
-webshot(paste("C:/Users/55131065/Desktop/downloadTweets/outputs/",Pf_regions_uni[i], "_emotions.html",sep=""),
-        paste("C:/Users/55131065/Desktop/downloadTweets/outputs/",Pf_regions_uni[i], "_emotions.png",sep=""), vwidth = 441, vheight = 351)
 
-#htmlwidgets::saveWidget(p, file=file.html", selfcontained = TRUE)
-# save
-# save(chart, file = "mygridplot.tiff")
-# 
-# ggsave(plot = chart,
-#          filename = paste(Pf_regions_uni[i],"sentiment_maps.png", sep="_"),
-#        height = 16, width = 30, unit = "cm", device = "png")
-# chart
 
-#https://stackoverflow.com/questions/52851396/create-a-pie-chart-with-chartjs-package-in-r
-#https://stackoverflow.com/questions/57569198/chart-js-radar-chart-legend-label-font-size-doesnt-work
-# library(chartjs)
-# chartjs(height = "500px") %>% 
-#   cjsPie(labels = mtcars[1:6,]) %>%
-#   cjsSeries(data = c(1:6))
-# Split the screen in 6 parts
+#-----------------------------------------------
+#Police-Pandemic Bigram Network
+#-----------------------------------------------
 
-}
+
+
+#creation of location-lookup table
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -785,7 +917,18 @@ summary(model)
 #looking at how often sentiment-associated words are preceded 
 #by "not" or other negating words.
 
+
 #https://www.datacamp.com/community/tutorials/sentiment-analysis-R
+
+#How sentiment-associated words are preceded by the word "Not"
+
+
+
+
+
+
+#How the word "Police" or "Policing" sentiment-associated words are preceded by the word "Police"
+
 
 
 
@@ -1122,6 +1265,18 @@ pirateplot(formula =  word_count ~ Released + Charted, #Formula
            jitter.val = .1, #Turn on jitter to see the songs better
            cex.lab = .9, cex.names = .7) #Axis label size
 
+
+my_colors <- c("#E69F00", "#56B4E9", "#009E73", "#CC79A7", "#D55E00")
+
+theme_lyrics <- function() 
+{
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_blank(), 
+        axis.ticks = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none")
+}
 
 
 
