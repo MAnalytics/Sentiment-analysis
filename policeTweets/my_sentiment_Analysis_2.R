@@ -164,7 +164,7 @@ data = data_2
 
 data = data_3
 nrow(data)
-
+head(data)
 
 # install.packages('rgeos', type='source')
 # install.packages('rgdal', type='source')

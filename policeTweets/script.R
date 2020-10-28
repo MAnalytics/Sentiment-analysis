@@ -65,7 +65,8 @@ hashtags1 <- c("pandemic police",
                         "coronavirus  police",
                         "covid  police",
                         "covid-19  police",
-                        "virus  police")
+                        "virus  police",
+                        "quarantine, police")
 
 
 
@@ -75,7 +76,8 @@ hashtags2 <- c("pandemic policing",
               "coronavirus  policing",
               "covid  policing",
               "covid-19  policing",
-              "virus  policing")
+              "virus  policing",
+              "quarantine policing")
 
 
 #tweets holder
@@ -151,6 +153,46 @@ write_as_csv(all_Tweets, paste("policeTweet_set_", 28, "_.csv", sep=""), na="NA"
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
+
+
+
+
+
+#keywords to search in tweets
+hashtags1 <- c("police", "policing")
+
+
+#tweets holder
+all_Tweets <- NULL
+
+#Given a party  
+for(i in seq_len(length(hashtags1))){ #i<-1
+  
+  tweets_g1 <- NULL
+  #tweets_g2 <- NULL
+  
+  tweets_g1 <- search_tweets(q=hashtags1[i],  n=17500, type="recent", include_rts=TRUE, 
+                               token = token, lang="en",geocode='53.805,-4.242,350mi')
+
+
+  if(nrow(tweets_g1)!=0){
+    tweets_g1 <- tweets_g1 %>% dplyr::mutate(class=hashtags1[i])
+    all_Tweets <- rbind(all_Tweets, tweets_g1)  #all_Tweets<-NULL
+  }
+  
+
+  flush.console()
+  print(paste(nrow(tweets_g1), nrow(tweets_g1), sep="||"))
+  print("waiting for 15.5 minutes")
+  testit(960)
+}
+
+
+write_as_csv(all_Tweets, paste("only_policeTweet_set_", 28, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
+
+
+
+
 
 
 
