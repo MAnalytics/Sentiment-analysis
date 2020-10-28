@@ -134,7 +134,7 @@ for(i in seq_len(length(hashtags1))){ #i<-1
 }
 
 
-write_as_csv(all_Tweets, paste("policeTweet_set_", 26, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
+write_as_csv(all_Tweets, paste("policeTweet_set_", 28, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
 
 
 
