@@ -95,6 +95,9 @@ data15 = read.table(file="./policeTweet_set_15_.csv", sep=",", head=TRUE)
 data16 = read.table(file="./policeTweet_set_16_.csv", sep=",", head=TRUE)
 
 
+data28 = read.table(file="./policeTweet_set_28_.csv", sep=",", head=TRUE)
+
+
 
 data = rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11,  
              data12, data13, data14, data15, data16) #, data17, data18, data19, data20,
@@ -310,8 +313,8 @@ write.table(placeTwt, file = paste("C:/Users/55131065/Desktop/downloadTweets/out
 flush.console()
 print(i)
 
-#write.table(placeTwt_nrc, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_nrc", ".csv", sep=""),
-#            sep=",", row.names = F)
+write.table(placeTwt_nrc, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_nrc", ".csv", sep=""),
+            sep=",", row.names = F)
 
 #write.table(placeTwt_bing, file = paste("C:/Users/55131065/Desktop/downloadTweets/outputs/", "cleaned_", Pf_names_regions_uni[i], "_bing", ".csv", sep=""),
 #            sep=",", row.names = F)
@@ -666,7 +669,8 @@ radarchart(UK_nrc_2, axistype=1, seg=3,
            vlcex=0.8,
            title=Pf_regions_uni[i])
 
-
+#legend(x=0.7, y=1.3, legend = rownames(UK_nrc_2[-c(1,2),]), 
+#       bty = "n", pch=20 , col=colors_in2, text.col = "black", cex=1.2, pt.cex=3)
 }
 
 #dev.copy(png,'myplot.png')
