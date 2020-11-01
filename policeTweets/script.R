@@ -136,7 +136,7 @@ for(i in seq_len(length(hashtags1))){ #i<-1
 }
 
 
-write_as_csv(all_Tweets, paste("policeTweet_set_", 32, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
+write_as_csv(all_Tweets, paste("policeTweet_set_", 35, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
 
 
 
@@ -188,7 +188,7 @@ for(i in seq_len(length(hashtags1))){ #i<-1
 }
 
 
-write_as_csv(all_Tweets, paste("only_policeTweet_set_", 32, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
+write_as_csv(all_Tweets, paste("only_policeTweet_set_", 35, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
 
 
 
