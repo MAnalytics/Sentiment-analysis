@@ -65,6 +65,7 @@ hashtags1 <- c("pandemic police",
                         "coronavirus  police",
                         "covid  police",
                         "covid-19  police",
+                        "covid19  police",
                         "virus  police",
                         "quarantine, police")
 
@@ -76,6 +77,7 @@ hashtags2 <- c("pandemic policing",
               "coronavirus  policing",
               "covid  policing",
               "covid-19  policing",
+              "covid19  policing",
               "virus  policing",
               "quarantine policing")
 
@@ -136,7 +138,7 @@ for(i in seq_len(length(hashtags1))){ #i<-1
 }
 
 
-write_as_csv(all_Tweets, paste("policeTweet_set_", 51, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
+write_as_csv(all_Tweets, paste("policeTweet_set_", 61, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
 
 
 
@@ -153,8 +155,6 @@ write_as_csv(all_Tweets, paste("policeTweet_set_", 51, "_.csv", sep=""), na="NA"
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
-
-
 
 
 
@@ -188,7 +188,7 @@ for(i in seq_len(length(hashtags1))){ #i<-1
 }
 
 
-write_as_csv(all_Tweets, paste("only_policeTweet_set_", 51, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
+write_as_csv(all_Tweets, paste("only_policeTweet_set_", 61, "_.csv", sep=""), na="NA", fileEncoding = "UTF-8")
 
 
 

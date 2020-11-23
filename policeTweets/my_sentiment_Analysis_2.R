@@ -664,7 +664,7 @@ colors_in2 <- alpha(coul,0.5)
 radarchart(UK_nrc_2, axistype=1, seg=3,
            pcol=colors_border, pfcol=colors_in, plwd=2, plty=1,
            #custom the grid
-           cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,24,8), cglwd=0.8,
+           cglcol="grey", cgltyr=1, axislabcol="grey", caxislabels=seq(0,24,8), cglwd=0.8,
            #custom labels
            vlcex=0.8,
            title=Pf_regions_uni[i])
